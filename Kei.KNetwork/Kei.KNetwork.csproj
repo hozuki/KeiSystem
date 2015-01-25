@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{59B23B38-918C-4401-909C-F85CDCB0CD44}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Kei.KNetwork</RootNamespace>
+    <AssemblyName>Kei.KNetwork</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>5</LangVersion>
+    <DocumentationFile>bin\Release\Kei.KNetwork.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConnectionListItem.cs" />
+    <Compile Include="ConnectionState.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="KClient.Interops.cs" />
+    <Compile Include="KClient.Working.cs" />
+    <Compile Include="KClient.Connection.cs" />
+    <Compile Include="KClient.cs" />
+    <Compile Include="KClient.HandledMessages.cs" />
+    <Compile Include="KClient.IncomingMessages.cs" />
+    <Compile Include="KHandledMessage.cs" />
+    <Compile Include="KMessage.cs" />
+    <Compile Include="KMessageCode.cs" />
+    <Compile Include="KMessageContent.cs" />
+    <Compile Include="KMessageHeader.cs" />
+    <Compile Include="MessageFactory.cs" />
+    <Compile Include="MessageIOErrorCode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions\ListExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kei.KTracker\Kei.KTracker.csproj">
+      <Project>{db1e6070-1221-4153-831e-d56472e90cc1}</Project>
+      <Name>Kei.KTracker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kei.Shared\Kei.Shared.csproj">
+      <Project>{93143c61-49cb-45a8-8033-c125d967ee8d}</Project>
+      <Name>Kei.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
+      <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>
+      <Name>MonoTorrent</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
