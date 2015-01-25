@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Kei.KNetwork")]
-[assembly: AssemblyDescription("KeiSystem 分布网络处理模块")]
+[assembly: AssemblyTitle("Kei.Gui")]
+[assembly: AssemblyDescription("KeiSystem 图形界面模块")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MIC Studio")]
-[assembly: AssemblyProduct("KeiSystem rev2")]
+[assembly: AssemblyProduct("KeiSystem")]
 [assembly: AssemblyCopyright("Copyright © 2015 MIC Studio")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("605f2fbc-0ab5-4e86-bd09-d589442bd76d")]
+[assembly: Guid("559ab3fe-dbff-4592-9948-1553cf1a58c9")]
 
 // 程序集的版本信息由下面四个值组成: 
 //

@@ -91,7 +91,7 @@ namespace Kei.KNetwork
         }
 
         /// <summary>
-        /// 获取本客户端用来处理 tracker 通信的 <see cref="Kei.KTracker.TrackerServer"/>。本属性为只读。
+        /// 获取本客户端用来处理 tracker 通信的 <see cref="Kei.KTracker.TrackerServer"/>。此属性为只读。
         /// </summary>
         public TrackerServer TrackerServer
         {
@@ -102,7 +102,7 @@ namespace Kei.KNetwork
         }
 
         /// <summary>
-        /// 获取本客户端的局域网地址及其监听端口。本属性为只读。
+        /// 获取本客户端的局域网地址及其监听端口。此属性为只读。
         /// </summary>
         public IPEndPoint LocalListenEndPoint
         {
@@ -113,7 +113,7 @@ namespace Kei.KNetwork
         }
 
         /// <summary>
-        /// 获取本客户端监听端点的的 <see cref="Kei.KEndPoint"/> 表示形式。本属性为只读。
+        /// 获取本客户端监听端点的的 <see cref="Kei.KEndPoint"/> 表示形式。此属性为只读。
         /// </summary>
         public KEndPoint LocalKEndPoint
         {

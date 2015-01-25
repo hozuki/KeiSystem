@@ -47,7 +47,7 @@ namespace Kei.Tests
         private StreamLogger _logger = null;
         private object _logger_lock = new object();
 
-        private static readonly string Rev = "rev2";
+        private const string Rev = "rev2";
 
         public Form1()
         {
@@ -176,10 +176,13 @@ namespace Kei.Tests
         void Form1_Load(object sender, EventArgs e)
         {
             _logger = StreamLogger.Create(new FileStream("log.log", FileMode.Append, FileAccess.Write));
+
+            Log("KeiSystem 测试程序及组件，" + Rev + "。");
+
             var possibleAddresses = Dns.GetHostEntry(IPAddress.Loopback).AddressList;
             foreach (var address in possibleAddresses)
             {
-                if (address.AddressFamily == AddressFamily.InterNetwork)
+                if (address.AddressFamily == AddressFamily.InterNetwork && IPUtil.IsAddressIntranet(address))
                 {
                     cboPossibleAddresses.Items.Add(address.ToString());
                 }
@@ -188,10 +191,13 @@ namespace Kei.Tests
             {
                 cboPossibleAddresses.SelectedIndex = 0;
             }
+            else
+            {
+                Log("在您的计算机上没有找到合适的内网地址，无法正常启动。");
+            }
 
             cboRegardAsStartTime.SelectedIndex = 0;
 
-            Log("KeiSystem 测试程序及组件，" + Rev + "。");
             groupBox2.Enabled = false;
             groupBox4.Enabled = false;
         }

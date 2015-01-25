@@ -19,9 +19,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{0634E4B1-7
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		GPLv2 = GPLv2
+		KeiSystemIcon.ico = KeiSystemIcon.ico
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{4FDA5EB2-2BC1-4DB4-9402-588B3DEEE2CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specification", "specification", "{C0D40055-CA1F-40AC-973A-3D13D469C121}"
+	ProjectSection(SolutionItems) = preProject
+		docs\specification\k-dist-tracker.v1.1.html = docs\specification\k-dist-tracker.v1.1.html
+		docs\specification\k-dist-tracker.v1.1.md = docs\specification\k-dist-tracker.v1.1.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kei.Gui", "Kei.Gui\Kei.Gui.csproj", "{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +71,12 @@ Global
 		{9DE5E483-8C87-4D2F-B056-4CA32FB1B885}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9DE5E483-8C87-4D2F-B056-4CA32FB1B885}.Stats|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE5E483-8C87-4D2F-B056-4CA32FB1B885}.Stats|Any CPU.Build.0 = Release|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Stats|Any CPU.ActiveCfg = Release|Any CPU
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}.Stats|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,5 +87,8 @@ Global
 		{DB1E6070-1221-4153-831E-D56472E90CC1} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{93143C61-49CB-45A8-8033-C125D967EE8D} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{9DE5E483-8C87-4D2F-B056-4CA32FB1B885} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
+		{4FDA5EB2-2BC1-4DB4-9402-588B3DEEE2CF} = {0634E4B1-76D9-4F1C-A92F-6A741676BF47}
+		{C0D40055-CA1F-40AC-973A-3D13D469C121} = {4FDA5EB2-2BC1-4DB4-9402-588B3DEEE2CF}
+		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 	EndGlobalSection
 EndGlobal

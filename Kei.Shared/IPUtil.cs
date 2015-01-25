@@ -85,5 +85,29 @@ namespace Kei
             return false;
         }
 
+        /// <summary>
+        /// 解析指定的字符串，得到一个 <see cref="System.Net.IPEndPoint"/>。
+        /// </summary>
+        /// <param name="str">指定的字符串，含有要解析的端点信息。</param>
+        /// <returns>解析出的 <see cref="System.Net.IPEndPoint"/></returns>
+        /// <exception cref="System.ArgumentNullException">str 为 null 时发生。</exception>
+        /// <exception cref="System.FormatException">输入的字符串不是 IP 端点时发生。</exception>
+        public static IPEndPoint ParseIPEndPoint(string str)
+        {
+            // 格式为: a.a.a.a:p
+            if (str == null)
+            {
+                throw new ArgumentNullException("str");
+            }
+            var s = str.Split(':');
+            if (s.Length != 2)
+            {
+                throw new FormatException("应该类似 a.a.a.a:p 的形式。");
+            }
+            var ipa = IPAddress.Parse(s[0]);
+            var port = Convert.ToInt32(s[1]);
+            return new IPEndPoint(ipa, port);
+        }
+
     }
 }
