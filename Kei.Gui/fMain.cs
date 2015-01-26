@@ -87,6 +87,18 @@ namespace Kei.Gui
             mnuHelpContent.Click += mnuHelpContent_Click;
         }
 
+        void _kClient_ConnectionListChanged(object sender, EventArgs e)
+        {
+            if (KGState >= KeiGuiState.Connected)
+            {
+                SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作 [" + _kClient.ConnectionList.Count.ToString() + "]");
+            }
+            else if (KGState >= KeiGuiState.ServersStarted)
+            {
+                SetStatusText("服务器已启动 [" + _kClient.ConnectionList.Count.ToString() + "]");
+            }
+        }
+
         void mnuHelpContent_Click(object sender, EventArgs e)
         {
             var fileName = Path.Combine(Application.StartupPath, "help/index.htm");
@@ -260,7 +272,7 @@ namespace Kei.Gui
                             {
                                 cboTargetKClientEndPoint.Items.Add(cboTargetKClientEndPoint.Text);
                             }
-                            SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作");
+                            SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作 [" + _kClient.ConnectionList.Count.ToString() + "]");
                             mnuOpForceBroadcast.Enabled = true;
                             ctxForceBroadcast.Enabled = true;
                         }));
@@ -310,6 +322,7 @@ namespace Kei.Gui
                     var ipa = IPAddress.Parse(cboPossibleAddresses.Text);
                     _kTracker = new TrackerServer(new IPEndPoint(ipa, Convert.ToInt32(txtLocalTrackerServerPort.Text)));
                     _kClient = new KClient(_kTracker, new IPEndPoint(ipa, Convert.ToInt32(txtLocalKClientPort.Text)));
+                    _kClient.ConnectionListChanged += _kClient_ConnectionListChanged;
 
                     if (KeiGuiOptions.Current.EnableLogging)
                     {

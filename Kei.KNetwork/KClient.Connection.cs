@@ -38,6 +38,12 @@ namespace Kei.KNetwork
     {
 
         /// <summary>
+        /// 连接列表发生变化时发生。
+        /// <para>该事件通常不是发生在 UI 线程上的。</para>
+        /// </summary>
+        public event EventHandler<EventArgs> ConnectionListChanged;
+
+        /// <summary>
         /// 发送一条消息的超时。若发送消息所用时间超过这个时间，则认为正在连接的端点无效。
         /// </summary>
         private static readonly TimeSpan SendTimeout = TimeSpan.FromMilliseconds(500);
@@ -76,6 +82,7 @@ namespace Kei.KNetwork
                 lock (ConnectionList)
                 {
                     ConnectionList.Add(connItem);
+                    EventHelper.RaiseEvent(ConnectionListChanged, this, EventArgs.Empty);
                 }
             }
             return connItem;
@@ -89,6 +96,7 @@ namespace Kei.KNetwork
         {
             Logger.Log("清扫连接列表。");
             var i = 0;
+            var removed = 0;
             lock (ConnectionList)
             {
                 while (i < ConnectionList.Count)
@@ -96,12 +104,18 @@ namespace Kei.KNetwork
                     if (ConnectionList[i].State == ConnectionState.RemovePending)
                     {
                         ConnectionList.RemoveAt(i);
+                        removed++;
                     }
                     else
                     {
                         i++;
                     }
                 }
+            }
+            if (removed > 0)
+            {
+                Logger.Log("清除了 " + removed.ToString() + " 个连接项。");
+                EventHelper.RaiseEvent(ConnectionListChanged, this, EventArgs.Empty);
             }
         }
 
