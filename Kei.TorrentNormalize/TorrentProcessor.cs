@@ -99,10 +99,15 @@ namespace Kei.TorrentNormalize
                     }
                     else
                     {
-                        // 单文件的种子是没有 files 项的
                         if ((torrent["info"] as BEncodedDictionary).ContainsKey("files"))
                         {
+                            // 单文件的种子是没有 files 项的
                             info.Add("files", (torrent["info"] as BEncodedDictionary)["files"]);
+                        }
+                        else
+                        {
+                            // 单文件的种子有 length 项
+                            info.Add("length", (torrent["info"] as BEncodedDictionary)["length"]);
                         }
                         info.Add("name", (torrent["info"] as BEncodedDictionary)["name"]);
                         info.Add("piece length", (torrent["info"] as BEncodedDictionary)["piece length"]);
