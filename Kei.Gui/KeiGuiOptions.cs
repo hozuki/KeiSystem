@@ -9,8 +9,11 @@ namespace Kei.Gui
     public class KeiGuiOptions : ICloneable
     {
 
+        public static readonly string DefaultConfigurationFileName = "kguicfg.xml";
+
         private static readonly KeiGuiOptions _default = new KeiGuiOptions()
         {
+            EnableLogging = true,
             AutoStartAndConnect = false,
             ForceBroadcastTime = TimeSpan.FromMinutes(1.5),
             LocalIntranetAddress = "192.168.0.1",
@@ -41,6 +44,12 @@ namespace Kei.Gui
         }
 
         private List<string> _targetEndPoints = new List<string>();
+
+        public bool EnableLogging
+        {
+            get;
+            set;
+        }
 
         public TimeSpan ForceBroadcastTime
         {
@@ -87,6 +96,7 @@ namespace Kei.Gui
             writer.WriteStartElement("kei-gui");
             writer.WriteAttributeString("config-version", "1.0");
 
+            writer.WriteElementString("EnableLogging", EnableLogging.ToString());
             writer.WriteElementString("LocalIntranetAddress", LocalIntranetAddress);
             writer.WriteElementString("LocalKClientPort", LocalKClientPort.ToString());
             writer.WriteElementString("LocalTrackerServerPort", LocalTrackerServerPort.ToString());
@@ -110,6 +120,7 @@ namespace Kei.Gui
 
             reader.ReadStartElement("kei-gui");
 
+            kg.EnableLogging = Convert.ToBoolean(reader.ReadElementString("EnableLogging"));
             kg.LocalIntranetAddress = reader.ReadElementString("LocalIntranetAddress");
             kg.LocalKClientPort = Convert.ToInt32(reader.ReadElementString("LocalKClientPort"));
             kg.LocalTrackerServerPort = Convert.ToInt32(reader.ReadElementString("LocalTrackerServerPort"));
@@ -131,6 +142,7 @@ namespace Kei.Gui
         {
             var kg = new KeiGuiOptions();
 
+            kg.EnableLogging = EnableLogging;
             kg.LocalIntranetAddress = LocalIntranetAddress;
             kg.LocalKClientPort = LocalKClientPort;
             kg.LocalTrackerServerPort = LocalTrackerServerPort;

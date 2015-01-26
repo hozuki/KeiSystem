@@ -46,6 +46,13 @@ namespace Kei.Gui
         {
             cmdClose.Click += cmdClose_Click;
             lnkProjectHomepage.LinkClicked += lnkProjectHomepage_LinkClicked;
+            lblApplicationTitle.DoubleClick += lblApplicationTitle_DoubleClick;
+        }
+
+        void lblApplicationTitle_DoubleClick(object sender, EventArgs e)
+        {
+            const string EE = @"漫版科学技术世界第一！";
+            MessageBox.Show(EE, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         void lnkProjectHomepage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

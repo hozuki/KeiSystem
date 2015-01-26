@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.IO;
@@ -64,8 +65,6 @@ namespace Kei.Gui
         private void ExtraInit()
         {
             mnuOpSeparator1.Visible = false;
-            mnuOpOptions.Visible = false;
-            ctxShowOptions.Visible = false;
         }
 
         private void InitializeEventHandlers()
@@ -84,6 +83,31 @@ namespace Kei.Gui
             ctxForceBroadcast.Click += forceBroadcast_Handler;
             tmrForceBroadcast.Tick += tmrForceBroadcast_Tick;
             mnuHelpAbout.Click += mnuHelpAbout_Click;
+            mnuOpOptions.Click += mnuOpOptions_Click;
+            mnuHelpContent.Click += mnuHelpContent_Click;
+        }
+
+        void mnuHelpContent_Click(object sender, EventArgs e)
+        {
+            var fileName = Path.Combine(Application.StartupPath, "help/index.htm");
+            if (File.Exists(fileName))
+            {
+                Process process = new Process();
+                process.StartInfo = new ProcessStartInfo(fileName);
+                process.Start();
+            }
+            else
+            {
+                MessageBox.Show((new FileInfo(fileName)).FullName + " 未找到。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        void mnuOpOptions_Click(object sender, EventArgs e)
+        {
+            using (var f = new fOptions())
+            {
+                f.ShowDialog(this);
+            }
         }
 
         void mnuHelpAbout_Click(object sender, EventArgs e)
@@ -128,11 +152,12 @@ namespace Kei.Gui
 
         private void TryReadOptions()
         {
-            if (File.Exists(Path.Combine(Application.StartupPath, "kguicfg.xml")))
+            var configFileName = Path.Combine(Application.StartupPath, KeiGuiOptions.DefaultConfigurationFileName);
+            if (File.Exists(configFileName))
             {
                 try
                 {
-                    using (var fs = new FileStream(Path.Combine(Application.StartupPath, "kguicfg.xml"), FileMode.Open, FileAccess.Read))
+                    using (var fs = new FileStream(configFileName, FileMode.Open, FileAccess.Read))
                     {
                         using (var xmlreader = new XmlTextReader(fs))
                         {
@@ -171,19 +196,22 @@ namespace Kei.Gui
             }
             if (KGState >= KeiGuiState.Connected)
             {
-                if (cboTargetKClientEndPoint.Items.Count > 0)
+                if (_kClient.ConnectionList.Count > 0)
                 {
                     KeiGuiOptions.Current.TargetEndPoints.Clear();
-                    foreach (var item in cboTargetKClientEndPoint.Items)
+                    lock (_kClient.ConnectionList)
                     {
-                        KeiGuiOptions.Current.TargetEndPoints.Add((string)item);
+                        foreach (var item in _kClient.ConnectionList)
+                        {
+                            KeiGuiOptions.Current.TargetEndPoints.Add(item.ClientLocation.ToString());
+                        }
                     }
                 }
             }
 
             try
             {
-                using (var fs = new FileStream(Path.Combine(Application.StartupPath, "kguicfg.xml"), FileMode.Create, FileAccess.Write))
+                using (var fs = new FileStream(Path.Combine(Application.StartupPath, KeiGuiOptions.DefaultConfigurationFileName), FileMode.Create, FileAccess.Write))
                 {
                     using (var xmlwriter = new XmlTextWriter(fs, Encoding.UTF8))
                     {
@@ -232,7 +260,7 @@ namespace Kei.Gui
                             {
                                 cboTargetKClientEndPoint.Items.Add(cboTargetKClientEndPoint.Text);
                             }
-                            SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text);
+                            SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作");
                             mnuOpForceBroadcast.Enabled = true;
                             ctxForceBroadcast.Enabled = true;
                         }));
@@ -242,6 +270,7 @@ namespace Kei.Gui
                         Invoke(new Action(() =>
                         {
                             cmdConnectToTargetKClient.Enabled = true;
+                            SetStatusText("未能连接到 " + cboTargetKClientEndPoint.Text);
                         }));
                     }
                 });
@@ -250,6 +279,7 @@ namespace Kei.Gui
             }
             catch (Exception ex)
             {
+                Program.Logger.Log(ex.Message);
             }
         }
 
@@ -280,6 +310,12 @@ namespace Kei.Gui
                     var ipa = IPAddress.Parse(cboPossibleAddresses.Text);
                     _kTracker = new TrackerServer(new IPEndPoint(ipa, Convert.ToInt32(txtLocalTrackerServerPort.Text)));
                     _kClient = new KClient(_kTracker, new IPEndPoint(ipa, Convert.ToInt32(txtLocalKClientPort.Text)));
+
+                    if (KeiGuiOptions.Current.EnableLogging)
+                    {
+                        _kTracker.Logger = Program.Logger;
+                        _kClient.Logger = Program.Logger;
+                    }
 
                     _kTracker.Listen();
                     _kClient.Listen();

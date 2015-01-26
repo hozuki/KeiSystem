@@ -70,10 +70,10 @@ namespace Kei.KTracker
         private IPEndPoint _localEndPoint;
 
         /// <summary>
-        /// 新建一个 <see cref="Kei.KTracker.HttpServer"/> 并将端口设置为一个指定端口。
+        /// 新建一个 <see cref="Kei.KTracker.HttpServer"/> 并将端点设置为一个指定端点。
         /// </summary>
-        /// <param name="port">指定的端口。</param>
-        internal HttpServer(IPEndPoint localEndPoint)
+        /// <param name="localEndPoint">指定的端点。</param>
+        protected HttpServer(IPEndPoint localEndPoint)
         {
             _localEndPoint = localEndPoint;
         }

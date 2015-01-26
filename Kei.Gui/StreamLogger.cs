@@ -36,6 +36,7 @@ namespace Kei.Gui
         private Stream _stream;
         private StreamWriter _writer;
         private bool _isDisposed = false;
+        private object _loggingObject = new object();
 
         private StreamLogger(Stream stream)
         {
@@ -47,7 +48,7 @@ namespace Kei.Gui
         {
             if (stream == null || !stream.CanWrite)
             {
-                throw new ArgumentException("Invalid stream for StreamLogger.");
+                throw new ArgumentException("用来记录的流无效。");
             }
             return new StreamLogger(stream);
         }
@@ -56,8 +57,11 @@ namespace Kei.Gui
         {
             if (!_isDisposed)
             {
-                _writer.WriteLine(DateTime.Now.ToString());
-                _writer.WriteLine(log);
+                lock (_loggingObject)
+                {
+                    _writer.WriteLine(DateTime.Now.ToString());
+                    _writer.WriteLine(log);
+                }
             }
         }
 

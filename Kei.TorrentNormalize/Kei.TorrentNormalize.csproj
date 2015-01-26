@@ -4,76 +4,89 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{59B23B38-918C-4401-909C-F85CDCB0CD44}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{A9A13A60-8AEB-4F12-9DDA-15BA6C4E30EA}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kei.KNetwork</RootNamespace>
-    <AssemblyName>Kei.KNetwork</AssemblyName>
+    <RootNamespace>Kei.TorrentNormalize</RootNamespace>
+    <AssemblyName>KeiTNorm</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\build\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\build\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>default</LangVersion>
-    <DocumentationFile>bin\Release\Kei.KNetwork.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Kei.TorrentNormalize.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionListItem.cs" />
-    <Compile Include="ConnectionState.cs" />
-    <Compile Include="Extensions\StreamExtensions.cs" />
-    <Compile Include="KClient.Interops.cs" />
-    <Compile Include="KClient.Working.cs" />
-    <Compile Include="KClient.Connection.cs" />
-    <Compile Include="KClient.cs" />
-    <Compile Include="KClient.HandledMessages.cs" />
-    <Compile Include="KClient.IncomingMessages.cs" />
-    <Compile Include="KHandledMessage.cs" />
-    <Compile Include="KMessage.cs" />
-    <Compile Include="KMessageCode.cs" />
-    <Compile Include="KMessageContent.cs" />
-    <Compile Include="KMessageHeader.cs" />
-    <Compile Include="MessageFactory.cs" />
-    <Compile Include="MessageIOErrorCode.cs" />
+    <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="fMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fMain.Designer.cs">
+      <DependentUpon>fMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TorrentProcessor.cs" />
+    <EmbeddedResource Include="fMain.resx">
+      <DependentUpon>fMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\ListExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Kei.Gui\Kei.Gui.csproj">
+      <Project>{e2423ce1-ca61-46ad-984a-2d6dd70f79f6}</Project>
+      <Name>Kei.Gui</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Kei.KTracker\Kei.KTracker.csproj">
       <Project>{db1e6070-1221-4153-831e-d56472e90cc1}</Project>
       <Name>Kei.KTracker</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kei.Shared\Kei.Shared.csproj">
-      <Project>{93143c61-49cb-45a8-8033-c125d967ee8d}</Project>
-      <Name>Kei.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
       <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>

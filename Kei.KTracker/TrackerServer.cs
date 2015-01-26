@@ -33,17 +33,40 @@ using MonoTorrent.BEncoding;
 
 namespace Kei.KTracker
 {
+    /// <summary>
+    /// 表示提供 Tracker 服务的 HTTP 服务器实例。
+    /// </summary>
     public sealed partial class TrackerServer : HttpServer
     {
 
+        /// <summary>
+        /// 本服务器使用的 announce URL。
+        /// </summary>
         private string _announceUrl;
 
-        public TrackerServer(IPEndPoint localEndPoint, string announceUrl = DefaultAnnounceUrl)
+        /// <summary>
+        /// 使用指定的端点建立一个新的 Tracker 服务器。
+        /// </summary>
+        /// <param name="localEndPoint">要绑定的本地端点。注意地址为本机的内网地址而非环回地址。</param>
+        public TrackerServer(IPEndPoint localEndPoint)
+            : this(localEndPoint, DefaultAnnounceUrl)
+        {
+        }
+
+        /// <summary>
+        /// 使用指定的端点和指定的 announce URL 建立一个新的 Tracker 服务器。
+        /// </summary>
+        /// <param name="localEndPoint">要绑定的本地端点。注意地址为本机的内网地址而非环回地址。</param>
+        /// <param name="announceUrl">指定的 announce URL。默认为 <see cref="Kei.KTracker.TrackerServer.DefaultAnnounceUrl"/>。</param>
+        private TrackerServer(IPEndPoint localEndPoint, string announceUrl)
             : base(localEndPoint)
         {
             _announceUrl = announceUrl;
         }
 
+        /// <summary>
+        /// 获取本 Tracker 服务器的 announce URL（以“?”结尾）。此属性为只读。
+        /// </summary>
         public string AnnouceUrl
         {
             get
@@ -52,6 +75,11 @@ namespace Kei.KTracker
             }
         }
 
+        /// <summary>
+        /// 覆盖父类的 HandleGetRequest 方法。
+        /// </summary>
+        /// <param name="processor">为此请求生成的 <see cref="Kei.KTracker.HttpProcessor"/> 对象。</param>
+        /// <param name="ioStream"><see cref="Kei.KTracker.HttpProcessor"/> 为此请求开启的 <see cref="System.IO.Stream"/>。</param>
         internal override void HandleGetRequest(HttpProcessor processor, Stream ioStream)
         {
             Logger.Log("[Tracker]GET 请求。请求 URL: " + processor.RequestUrl);
@@ -67,11 +95,22 @@ namespace Kei.KTracker
             }
         }
 
+        /// <summary>
+        /// 覆盖父类的 HandlePostRequest 方法。
+        /// </summary>
+        /// <param name="processor">为此请求生成的 <see cref="Kei.KTracker.HttpProcessor"/> 对象。</param>
+        /// <param name="ioStream"><see cref="Kei.KTracker.HttpProcessor"/> 为此请求开启的 <see cref="System.IO.Stream"/>。</param>
         internal override void HandlePostRequest(HttpProcessor processor, Stream ioStream)
         {
             processor.WriteFailure();
         }
 
+        /// <summary>
+        /// 处理 Tracker 请求的方法。
+        /// </summary>
+        /// <param name="processor">为此请求生成的 <see cref="Kei.KTracker.HttpProcessor"/> 对象。</param>
+        /// <param name="ioStream"><see cref="Kei.KTracker.HttpProcessor"/> 为此请求开启的 <see cref="System.IO.Stream"/>。</param>
+        /// <param name="parameters">URL 请求参数。</param>
         private void HandleTrackerRequest(HttpProcessor processor, Stream ioStream, string parameters)
         {
             // parameters 传入类似 info_hash=XXXX&port=XXXX&ipv6=XXXX 的形式

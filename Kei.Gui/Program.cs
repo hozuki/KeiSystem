@@ -2,20 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.IO;
+using System.Threading;
 
 namespace Kei.Gui
 {
-    static class Program
+    internal static class Program
     {
+
+        private static StreamLogger _logger;
+
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new fMain());
+            bool isOnlyInstance;
+            Mutex mutex = new Mutex(true, "kei-gui", out isOnlyInstance);
+            if (isOnlyInstance)
+            {
+                using (var fs = new FileStream(Path.Combine(Application.StartupPath, "ksyslog.log"), FileMode.Append, FileAccess.Write))
+                {
+                    using (_logger = StreamLogger.Create(fs))
+                    {
+                        Application.EnableVisualStyles();
+                        Application.SetCompatibleTextRenderingDefault(false);
+                        using (var fM = new fMain())
+                        {
+                            Application.Run(fM);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("KeiGui 已经启动。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            mutex.Dispose();
+        }
+
+        internal static StreamLogger Logger
+        {
+            get
+            {
+                return _logger;
+            }
         }
     }
 }

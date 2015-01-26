@@ -52,7 +52,7 @@
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\build\bin\Debug\</OutputPath>
     <RegisterForComInterop>False</RegisterForComInterop>
     <RemoveIntegerChecks>False</RemoveIntegerChecks>
     <WarningLevel>4</WarningLevel>
@@ -67,7 +67,7 @@
     <DocumentationFile>bin\Release\MonoTorrent.XML</DocumentationFile>
     <FileAlignment>4096</FileAlignment>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\build\bin\Release\</OutputPath>
     <RegisterForComInterop>False</RegisterForComInterop>
     <RemoveIntegerChecks>False</RemoveIntegerChecks>
     <WarningLevel>4</WarningLevel>
@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Stats|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Stats\</OutputPath>
+    <OutputPath>..\build\bin\Stats\</OutputPath>
     <DefineConstants>TRACE;DEBUG;STATS</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
