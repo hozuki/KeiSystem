@@ -47,7 +47,7 @@ namespace Kei.Tests
         private StreamLogger _logger = null;
         private object _logger_lock = new object();
 
-        private const string Rev = "rev2";
+        private const string Rev = "rev3";
 
         public Form1()
         {

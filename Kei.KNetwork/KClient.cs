@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.Net.Sockets;
 using Kei.KTracker;
 
 namespace Kei.KNetwork
@@ -46,7 +47,7 @@ namespace Kei.KNetwork
         /// <summary>
         /// 本客户端监听的本地端点。注意，地址应采用局域网地址。
         /// </summary>
-        private IPEndPoint _localListenEndPoint;
+        private IPEndPoint _localEndPoint;
 
         /// <summary>
         /// 本客户端记录日志所使用的 <see cref="Kei.ILogger"/>。
@@ -62,13 +63,14 @@ namespace Kei.KNetwork
         /// 使用指定的 <see cref="Kei.KTracker.TrackerServer"/> 和 <see cref="System.Net.IPEndPoint"/> 创建一个新的 <see cref="Kei.KNetwork.KClient"/> 实例。
         /// </summary>
         /// <param name="trackerServer">要用来处理 tracker 通信的 <see cref="Kei.KTracker.TrackerServer"/>。</param>
-        /// <param name="localListenEndPoint">一个 <see cref="System.Net.IPEndPoint"/>，用来指示本地监听端点。注意应该使用本地局域网地址。</param>
-        public KClient(TrackerServer trackerServer, IPEndPoint localListenEndPoint)
+        /// <param name="localEndPoint">一个 <see cref="System.Net.IPEndPoint"/>，用来指示本地监听端点。注意应该使用本地局域网地址。</param>
+        public KClient(TrackerServer trackerServer, IPEndPoint localEndPoint)
         {
             _trackerServer = trackerServer;
-            _localListenEndPoint = localListenEndPoint;
+            SetLocalEndPoint(localEndPoint);
             _trackerServer.TrackerComm += TrackerServer_TrackerComm;
-            _localKEndPoint = KEndPoint.FromEndPoint(localListenEndPoint);
+            _listener = new TcpListener(IPAddress.Any, LocalEndPoint.Port);
+            FreeToGo = false;
         }
 
         /// <summary>
@@ -104,11 +106,11 @@ namespace Kei.KNetwork
         /// <summary>
         /// 获取本客户端的局域网地址及其监听端口。此属性为只读。
         /// </summary>
-        public IPEndPoint LocalListenEndPoint
+        public IPEndPoint LocalEndPoint
         {
             get
             {
-                return _localListenEndPoint;
+                return _localEndPoint;
             }
         }
 
@@ -121,6 +123,21 @@ namespace Kei.KNetwork
             {
                 return _localKEndPoint;
             }
+        }
+
+        /// <summary>
+        /// 设置本客户端的端点为新的端点。用于自我端点确认。
+        /// </summary>
+        /// <param name="ep">要被设置为的端点。</param>
+        /// <exception cref="System.ArgumentNullException">ep 为 null 时发生。</exception>
+        private void SetLocalEndPoint(IPEndPoint ep)
+        {
+            if (ep == null)
+            {
+                throw new ArgumentNullException("ep");
+            }
+            _localEndPoint = ep;
+            _localKEndPoint = KEndPoint.FromEndPoint(_localEndPoint);
         }
 
     }

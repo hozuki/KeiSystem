@@ -92,7 +92,7 @@ namespace Kei.KNetwork
             // +4
             header.Code = (KMessageCode)BitConverter.ToInt32(data, 14);
             // +?
-            header.SourceEndPoint = KEndPoint.FromByteArray(data.Skip(18).ToArray());
+            header.SourceEndPoint = KEndPoint.FromByteArray(data.Skip(18).Take(6).ToArray());
 
             return header;
         }

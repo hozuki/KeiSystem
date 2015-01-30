@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
 using Kei.KTracker;
 using MonoTorrent.BEncoding;
 
@@ -56,6 +57,15 @@ namespace Kei.KNetwork
             }
         }
 
+        /// <summary>
+        /// 设置或返回是否已经完成启动。
+        /// </summary>
+        public bool FreeToGo
+        {
+            get;
+            set;
+        }
+
         private void TrackerServer_TrackerComm(object sender, TrackerCommEventArgs e)
         {
             string tmpLog;
@@ -63,41 +73,44 @@ namespace Kei.KNetwork
             tmpLog += Environment.NewLine + "Infohash: " + e.InfoHash.ToHexString();
             tmpLog += Environment.NewLine + "状态: " + e.Status.ToString();
             Logger.Log(tmpLog);
-            switch (e.Status)
+            if (FreeToGo)
             {
-                case TaskStatus.Stopped:
-                case TaskStatus.Paused:
-                    BroadcastMyselfRemoveAsPeer(e.InfoHash);
-                    break;
-                case TaskStatus.Started:
-                    BroadcastMyselfAddAsPeer(e.InfoHash);
-                    break;
-                default:
-                    if (RegardNormalTrackerCommAsStarted)
-                    {
+                switch (e.Status)
+                {
+                    case TaskStatus.Stopped:
+                    case TaskStatus.Paused:
+                        BroadcastMyselfRemoveAsPeer(e.InfoHash);
+                        break;
+                    case TaskStatus.Started:
                         BroadcastMyselfAddAsPeer(e.InfoHash);
-                    }
-                    else
-                    {
-                        lock (TrackerServer.Seeds)
+                        break;
+                    default:
+                        if (RegardNormalTrackerCommAsStarted)
                         {
-                            if (!TrackerServer.Seeds.ContainsKey(e.InfoHash))
+                            BroadcastMyselfAddAsPeer(e.InfoHash);
+                        }
+                        else
+                        {
+                            lock (TrackerServer.Seeds)
                             {
-                                var peerList = new List<Peer>(8);
-                                peerList.Add(TrackerServer.Myself);
-                                TrackerServer.Seeds.Add(e.InfoHash, peerList); ;
+                                if (!TrackerServer.Seeds.ContainsKey(e.InfoHash))
+                                {
+                                    var peerList = new List<Peer>(8);
+                                    peerList.Add(TrackerServer.Myself);
+                                    TrackerServer.Seeds.Add(e.InfoHash, peerList); ;
+                                }
                             }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         }
 
         /// <summary>
-        /// 将当前的连接列表和用户列表编码进字节数组，以供之后的传输。
+        /// 将作为接入点被连接时候需要返回给对方的信息编码以供发送。
         /// </summary>
-        /// <returns>一个 B-编码形式的字节数组，包含了当前的连接列表和用户列表。</returns>
-        private byte[] EncodeFromConnectionListAndSeedDictionary()
+        /// <returns>一个 B-编码形式的字节数组，包含了所需的信息。</returns>
+        private byte[] EncodeTargetInformation(IPEndPoint targetEndPoint)
         {
             // 返回当前所有的连接信息
             // 结构：
@@ -123,6 +136,11 @@ namespace Kei.KNetwork
             //                 }
             //             ... infohash_n
             //         }
+            //     "your endpoint" : d
+            //     {
+            //         "ip" : ip(4)
+            //         "port" : port(2)
+            //     }
             // }
             BEncodedDictionary dictionary = new BEncodedDictionary();
             BEncodedList connList = new BEncodedList(ConnectionList.Count);
@@ -154,19 +172,24 @@ namespace Kei.KNetwork
                 }
             }
             dictionary.Add("peers", peersList);
+            BEncodedDictionary yourEndPoint = new BEncodedDictionary();
+            yourEndPoint.Add("ip", targetEndPoint.Address.GetAddressBytes());
+            yourEndPoint.Add("port", BitConverter.GetBytes((ushort)(targetEndPoint.Port & 0xffff)));
+            dictionary.Add("your endpoint", yourEndPoint);
             byte[] data = dictionary.Encode();
             return data;
         }
 
         /// <summary>
-        /// 解码收到的字节数组，并将其包含的连接列表和用户列表添加到本客户端的相应列表中。
+        /// 解码连接到接入点时收到的字节数组，并应用这些信息。
         /// </summary>
         /// <param name="data">收到的数据。</param>
         ///// <param name="sendPeerEnter">解码过程中是否应该广播 PeerEnterNetwork 消息。</param>
+        /// <exception cref="System.FormatException">解码失败时发生。</exception>
         /// <remarks>
         /// 需要发送 PeerEnterNetwork 消息的情况会发生于：A开启客户端和μT，B开启客户端和μT，A（用户列表非空）再尝试连接B，此时如果B并没有保存全网的用户列表，那么A就要广播 PeerEnterNetwork。
         /// </remarks>
-        private void DecodeToConnectionListAndSeedDicionary(byte[] data)
+        private void DecodeTargetInformation(byte[] data)
         {
             // 如果对方发过来的是空，那么就肯定不会有数据啦
             if (data.Length > 0)
@@ -174,10 +197,27 @@ namespace Kei.KNetwork
                 BEncodedDictionary dictionary = BEncodedDictionary.Decode(data) as BEncodedDictionary;
                 if (dictionary == null)
                 {
-                    throw new Exception();
+                    throw new FormatException("无法解码。");
                 }
                 BEncodedList connList = dictionary["connections"] as BEncodedList;
                 BEncodedDictionary peersDict = dictionary["peers"] as BEncodedDictionary;
+                
+                // 规范 v1.2
+                // 先确认自己，同时 if ... 是兼容老版的通信
+                if (dictionary.ContainsKey("your endpoint"))
+                {
+                    BEncodedDictionary yourEndPoint = dictionary["your endpoint"] as BEncodedDictionary;
+                    var ip = new IPAddress((yourEndPoint["ip"] as BEncodedString).TextBytes);
+                    var port = BitConverter.ToUInt16((yourEndPoint["port"] as BEncodedString).TextBytes, 0);
+                    // 分别设置 KClient、TrackerServer 和 BT 客户端的自己
+                    SetLocalEndPoint(new IPEndPoint(ip, port));
+                    TrackerServer.SetLocalEndPoint(new IPEndPoint(ip, TrackerServer.LocalEndPoint.Port));
+                    TrackerServer.SetMyself(new IPEndPoint(ip, TrackerServer.Myself.EndPoint.GetPortNumber()));
+
+                    this.FreeToGo = true;
+                    TrackerServer.FreeToGo = true;
+                }
+
                 // ...
                 lock (ConnectionList)
                 {
@@ -186,8 +226,14 @@ namespace Kei.KNetwork
                         var d = item as BEncodedDictionary;
                         KEndPoint kep = KEndPoint.Empty;
                         kep.SetAddress((d["ip"] as BEncodedString).TextBytes);
-                        kep.SetPort((int)BitConverter.ToInt16((d["port"] as BEncodedString).TextBytes, 0));
-                        ConnectionList.Add(new ConnectionListItem(kep));
+                        kep.SetPort((int)BitConverter.ToUInt16((d["port"] as BEncodedString).TextBytes, 0));
+                        try
+                        {
+                            AddToConnectionList(kep);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
 
@@ -214,11 +260,17 @@ namespace Kei.KNetwork
                             var d = item as BEncodedDictionary;
                             KEndPoint kep = KEndPoint.Empty;
                             kep.SetAddress((d["ip"] as BEncodedString).TextBytes);
-                            kep.SetPort((int)BitConverter.ToInt16((d["port"] as BEncodedString).TextBytes, 0));
+                            kep.SetPort((int)BitConverter.ToUInt16((d["port"] as BEncodedString).TextBytes, 0));
                             Peer peer = Peer.Create(kep);
                             peers.Add(peer);
                         }
-                        TrackerServer.Seeds.Add(infoHash, peers);
+                        try
+                        {
+                            TrackerServer.Seeds.Add(infoHash, peers);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
             }

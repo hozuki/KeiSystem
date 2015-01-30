@@ -54,8 +54,9 @@ namespace Kei.TorrentNormalize
 
             if (true && !string.IsNullOrEmpty(inputFilename) && torrent != null)
             {
+                FileInfo fi = new FileInfo(inputFilename);
                 // 先判断是否是未来花园的种子
-                if (inputFilename.StartsWith("[FGBT]."))
+                if (fi.Name.StartsWith("[FGBT]."))
                 {
                     try
                     {

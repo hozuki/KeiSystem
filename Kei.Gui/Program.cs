@@ -19,10 +19,11 @@ namespace Kei.Gui
         private static void Main()
         {
             bool isOnlyInstance;
-            Mutex mutex = new Mutex(true, "kei-gui", out isOnlyInstance);
+            Mutex mutex;
+            mutex = new Mutex(true, "kei-gui", out isOnlyInstance);
             if (isOnlyInstance)
             {
-                using (var fs = new FileStream(Path.Combine(Application.StartupPath, "ksyslog.log"), FileMode.Append, FileAccess.Write))
+                using (var fs = new FileStream(Path.Combine(Application.StartupPath, "KeiSystem.Debugging.log"), FileMode.Append, FileAccess.Write))
                 {
                     using (_logger = StreamLogger.Create(fs))
                     {
@@ -37,7 +38,7 @@ namespace Kei.Gui
             }
             else
             {
-                MessageBox.Show("KeiGui 已经启动。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("KeiGUI 已经启动。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             mutex.Dispose();
         }

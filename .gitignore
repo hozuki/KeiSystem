@@ -33,6 +33,7 @@ obj/
 [Rr]elease*/
 [Oo]bselete
 [Bb]uild/
+[Bb]ackup*/
 
 #Subversion files
 .svn

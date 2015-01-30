@@ -53,6 +53,7 @@ namespace Kei.Gui
             return new StreamLogger(stream);
         }
 
+        [System.Diagnostics.DebuggerStepThrough()]
         public void Log(string log)
         {
             if (!_isDisposed)

@@ -68,7 +68,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(83, 12);
             this.label2.TabIndex = 2;
-            this.label2.Text = "GUI 版本: 0.1";
+            this.label2.Text = "GUI 版本: 0.2";
             // 
             // label3
             // 
@@ -77,7 +77,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(113, 12);
             this.label3.TabIndex = 3;
-            this.label3.Text = "核心版本: 0.1 rev2";
+            this.label3.Text = "核心版本: 0.2 rev3";
             // 
             // label4
             // 
@@ -136,8 +136,9 @@
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(285, 46);
             this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "使用了 MonoTorrent 与 SimpleHttpServer，对应授权见其条款。\r\n---------\r\n感谢协助开发与测试的各位（主要按照时间顺序）：\r" +
-    "\n> 剑魄\r\n> FC#38、LH#27\r\n> lansure\r\n> Yooyi、白写\r\n加上提出了设备&技术支持意向的tlanyan\r\n以及漫版众人……";
+            this.textBox1.Text = "使用的第三方库有：\r\n+ MonoTorrent\r\n+ SimpleHttpServer\r\n+ Mono.Nat\r\n对应授权见其条款。\r\n---------\r\n感" +
+    "谢协助开发与测试的各位（主要按照时间顺序）：\r\n> 剑魄\r\n> FC#38、LH#27\r\n> lansure\r\n> Yooyi、白写\r\n> WX#26\r\n加上提" +
+    "出了设备&技术支持意向的tlanyan\r\n以及漫版众人……";
             // 
             // fAbout
             // 

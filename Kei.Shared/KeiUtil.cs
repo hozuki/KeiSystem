@@ -32,9 +32,9 @@ using System.Net.Sockets;
 namespace Kei
 {
     /// <summary>
-    /// IP 地址相关实用类。
+    /// KeiSystem 公用实用类。
     /// </summary>
-    public static class IPUtil
+    public static class KeiUtil
     {
 
         /// <summary>
@@ -107,6 +107,31 @@ namespace Kei
             var ipa = IPAddress.Parse(s[0]);
             var port = Convert.ToInt32(s[1]);
             return new IPEndPoint(ipa, port);
+        }
+
+        /// <summary>
+        /// 获取一个指定端口的环回端点。
+        /// </summary>
+        /// <param name="port">指定的端口。</param>
+        /// <returns>获取的 <see cref="System.Net.IPEndPoint"/>。</returns>
+        public static IPEndPoint GetLoopbackEndPoint(int port)
+        {
+            return new IPEndPoint(IPAddress.Loopback, port);
+        }
+
+        /// <summary>
+        /// 翻转字节序。常用于网络传输字节序不匹配时。
+        /// </summary>
+        /// <param name="source">要翻转的源字节数组。</param>
+        /// <returns>翻转后的字节数组。</returns>
+        /// <exception cref="System.ArgumentException">source 为 null 时发生。</exception>
+        public static byte[] ReverseByteOrder(byte[] source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            return source.Reverse().ToArray();
         }
 
     }

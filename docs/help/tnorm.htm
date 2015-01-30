@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-<title>KeiSystem.TorrentNormalizer</title>
+<title>KeiSystem 种子文件标准化工具 (KeiTNorm)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -289,9 +289,10 @@ img {
   max-width: 100%
 }
 </style>
+<base href='file:\\\D:\Source Code Of Programs\GitHub\KeiSystem\docs\help\'/>
 </head>
 <body>
-<h1>KeiTNorm</h1>
+<h1>KeiSystem 种子文件标准化工具 (KeiTNorm)</h1>
 <p>KeiTNorm 是 KeiSystem.TorrentNormalizer 的简写，对应 KeiTNorm.exe。</p>
 <p>这个程序的作用是将已有的种子标准化以用于 KS 网络内部的查找。其使用方式同时也是用于 KS 网络的种子的制作教程。</p>
 <h2>可视化使用方式</h2>
@@ -304,7 +305,8 @@ img {
 <p>将一个有效的种子文件（自制的、公网或者其他 PT 站的种子）拖曳到窗口中的文本框上。文本框中将显示出该种子的主要信息。</p>
 <h3>第 3 步</h3>
 <p>单击“生成新种子”按钮。如果预计的位置已经有了相应的文件，会询问您是否覆盖。</p>
-<p>会在原文件的目录下生成以“[KS].”为前缀的新文件。例如，原文件名为 <code>[FGBT].[CASO&amp;SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent</code>，则生成的文件名将是 <code>[KS].[FGBT].[CASO&amp;SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent</code>。</p>
+<p>会在原文件的目录下生成以“[KS].”为前缀的新文件。</p>
+<p>例如，原文件名为 <code>[FGBT].[CASO&amp;SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent</code>，则生成的文件名将是 <code>[KS].[FGBT].[CASO&amp;SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent</code>。</p>
 <p>生成的种子就可以发布了。</p>
 <h3>第 4 步</h3>
 <p>将生成的种子文件添加到 BT 客户端的任务列表中。由于默认参数已经配置好，因此一般不需要其他配置。</p>
@@ -322,7 +324,7 @@ img {
 <p><code>KeiTNorm.exe [{torrent1} [{torrent2} [...]]]</code></p>
 <p>则将分别在 <code>{torrent1}</code>、<code>{torrent2}</code> 等等位置生成对应的新种子文件。</p>
 <hr />
-<p>最后更新于 2015-01-27</p>
+<p>最后更新于 2015-01-29</p>
 <p><a href="./index.htm">返回主页</a></p>
 <p>Copyright (C) 2015 micstu@FGBT</p>
 

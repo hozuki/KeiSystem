@@ -99,7 +99,7 @@ namespace Kei.KTracker
         }
 
         /// <summary>
-        /// 获取或设置与当前的 <see cref="Kei.InfoHash"/> 相关联的用户列表。
+        /// 获取或设置与当前的 <see cref="Kei.InfoHash"/> 相关联的用户列表。可能为 null，表示不可用。
         /// </summary>
         public List<Peer> Peers
         {

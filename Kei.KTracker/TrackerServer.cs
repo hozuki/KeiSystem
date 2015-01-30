@@ -62,6 +62,7 @@ namespace Kei.KTracker
             : base(localEndPoint)
         {
             _announceUrl = announceUrl;
+            FreeToGo = false;
         }
 
         /// <summary>
@@ -73,6 +74,15 @@ namespace Kei.KTracker
             {
                 return _announceUrl;
             }
+        }
+
+        /// <summary>
+        /// 获取或设置是否已完成启动。
+        /// </summary>
+        public bool FreeToGo
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -174,65 +184,106 @@ namespace Kei.KTracker
                 Logger.Log("[Tracker]新的自己(BitTorrent 客户端): " + newMyself.ToString());
                 SetMyself(newMyself, peerIDString);
 
-                List<Peer> peers;
+                List<Peer> peers = null;
                 TrackerCommEventArgs eventArgs;
 
-                // 触发事件，得到新的可用用户列表
-                if (Seeds.TryGetValue(infoHash, out peers))
+                // 如果接入分布网络完成
+                if (FreeToGo)
                 {
-                    peers = Seeds[infoHash];
-                }
-                else
-                {
-                    peers = new List<Peer>();
-                    // TODO: 添加 myself
-                    peers.Add(_myself);
-                    Seeds.Add(infoHash, peers);
+                    // 触发事件，得到新的可用用户列表
+                    if (Seeds.TryGetValue(infoHash, out peers))
+                    {
+                        peers = Seeds[infoHash];
+                        if (peers.IndexOf(_myself) < 0)
+                        {
+                            // 如果之前我不在种子列表中
+                            // TODO: 添加 myself
+                            peers.Add(_myself);
+                            // 而且此时确认为自己加入网络，强制设定 event=started
+                            taskStatus = TaskStatus.Started;
+                        }
+                    }
+                    else
+                    {
+                        // 如果之前没有相关种子
+                        peers = new List<Peer>();
+                        // TODO: 添加 myself
+                        peers.Add(_myself);
+                        Seeds.Add(infoHash, peers);
+                        // 而且此时确认为自己加入网络，强制设定 event=started
+                        taskStatus = TaskStatus.Started;
+                    }
                 }
                 eventArgs = new TrackerCommEventArgs(infoHash, peers, portNo, peerIDString, compact, noPeerID, taskStatus);
                 EventHelper.RaiseEventAsync(TrackerComm, this, eventArgs);
-                if (eventArgs.Peers == null)
+                //if (eventArgs.Peers == null)
+                //{
+                //    throw new NullReferenceException("Peers list is null");
+                //}
+                if (eventArgs.Peers != null)
                 {
-                    throw new NullReferenceException("Peers list is null");
+                    peers = eventArgs.Peers;
                 }
 
                 // 生成返回给 μTorrent 的信息
                 Logger.Log("[Tracker]反馈给 BitTorrent 客户端。");
+                if (peers != null)
+                {
+                    string peersListString = "[Tracker]种子 " + infoHash.ToString() + " 的用户列表如下:";
+                    foreach (var p in peers)
+                    {
+                        peersListString += Environment.NewLine + p.EndPoint.ToString();
+                    }
+                    Logger.Log(peersListString);
+                }
+                else
+                {
+                    Logger.Log("[Tracker]种子 " + infoHash.ToString() + " 的用户列表为空。");
+                }
                 BEncodedDictionary data = new BEncodedDictionary();
                 data.Add("interval", 60);
-                // 为了防止其他线程修改这个 list 导致迭代器失效，先锁定这个对象
-                lock (peers)
+                if (peers != null)
                 {
-                    if (compact)
+                    // 如果种子列表里有种子
+                    // 为了防止其他线程修改这个 list 导致迭代器失效，先锁定这个对象
+                    lock (peers)
                     {
-                        // 生成字节数组
-                        byte[] peersArray = new byte[peers.Count * 6];
-                        byte[] tmp;
-                        int i = 0;
-                        foreach (var peer in peers)
+                        if (compact)
                         {
-                            tmp = peer.ToByteArray();
-                            Array.Copy(tmp, 0, peersArray, i * 6, 6);
-                            i++;
+                            // 生成字节数组
+                            byte[] peersArray = new byte[peers.Count * 6];
+                            byte[] tmp;
+                            int i = 0;
+                            foreach (var peer in peers)
+                            {
+                                tmp = peer.ToByteArray();
+                                Array.Copy(tmp, 0, peersArray, i * 6, 6);
+                                i++;
+                            }
+                            data.Add("peers", peersArray);
                         }
-                        data.Add("peers", peersArray);
-                    }
-                    else
-                    {
-                        // 生成列表
-                        BEncodedList peersList = new BEncodedList(peers.Count);
-                        foreach (var peer in peers)
+                        else
                         {
-                            BEncodedDictionary peerDict = new BEncodedDictionary();
-                            peerDict.Add("id", peer.ID);
-                            peerDict.Add("ip", peer.EndPoint.GetAddressString());
-                            peerDict.Add("port", peer.EndPoint.GetPortNumber());
-                            peersList.Add(peerDict);
+                            // 生成列表
+                            BEncodedList peersList = new BEncodedList(peers.Count);
+                            foreach (var peer in peers)
+                            {
+                                BEncodedDictionary peerDict = new BEncodedDictionary();
+                                peerDict.Add("id", peer.ID);
+                                peerDict.Add("ip", peer.EndPoint.GetAddressString());
+                                peerDict.Add("port", peer.EndPoint.GetPortNumber());
+                                peersList.Add(peerDict);
+                            }
+                            data.Add("peers", peersList);
                         }
-                        data.Add("peers", peersList);
                     }
+                    data.Add("complete", peers.Count);
                 }
-                data.Add("complete", peers.Count);
+                else
+                {
+                    // 如果没有种子，就返回空列表
+                    data.Add("peers", string.Empty);
+                }
 
                 // 输出
                 Logger.Log("[Tracker]写入“成功”头。");

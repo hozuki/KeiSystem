@@ -35,11 +35,8 @@
             this.cmdOK = new System.Windows.Forms.Button();
             this.cmdCancel = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.chkBeAPointInsertion = new System.Windows.Forms.CheckBox();
+            this.chkUsePortMapping = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // chkEnableLogging
@@ -95,59 +92,31 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(115, 172);
+            this.label2.Location = new System.Drawing.Point(79, 177);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(125, 12);
+            this.label2.Size = new System.Drawing.Size(161, 12);
             this.label2.TabIndex = 5;
-            this.label2.Text = "* 选项为下次启动生效";
+            this.label2.Text = "* 选项在下次程序启动时生效";
             // 
-            // label3
+            // chkBeAPointInsertion
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(23, 77);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 12);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "接入点:";
-            this.label3.Visible = false;
+            this.chkBeAPointInsertion.AutoSize = true;
+            this.chkBeAPointInsertion.Location = new System.Drawing.Point(25, 73);
+            this.chkBeAPointInsertion.Name = "chkBeAPointInsertion";
+            this.chkBeAPointInsertion.Size = new System.Drawing.Size(126, 16);
+            this.chkBeAPointInsertion.TabIndex = 6;
+            this.chkBeAPointInsertion.Text = "作为接入点启动(&N)";
+            this.chkBeAPointInsertion.UseVisualStyleBackColor = true;
             // 
-            // comboBox1
+            // chkUsePortMapping
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(25, 92);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(163, 20);
-            this.comboBox1.TabIndex = 7;
-            this.comboBox1.Visible = false;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(25, 118);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(163, 21);
-            this.textBox1.TabIndex = 8;
-            this.textBox1.Visible = false;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(194, 92);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(27, 20);
-            this.button1.TabIndex = 9;
-            this.button1.Text = "+";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Visible = false;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(194, 119);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(27, 20);
-            this.button2.TabIndex = 10;
-            this.button2.Text = "-";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Visible = false;
+            this.chkUsePortMapping.AutoSize = true;
+            this.chkUsePortMapping.Location = new System.Drawing.Point(44, 95);
+            this.chkUsePortMapping.Name = "chkUsePortMapping";
+            this.chkUsePortMapping.Size = new System.Drawing.Size(156, 16);
+            this.chkUsePortMapping.TabIndex = 7;
+            this.chkUsePortMapping.Text = "尝试端口映射(&P) (beta)";
+            this.chkUsePortMapping.UseVisualStyleBackColor = true;
             // 
             // fOptions
             // 
@@ -156,11 +125,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cmdCancel;
             this.ClientSize = new System.Drawing.Size(252, 239);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.chkUsePortMapping);
+            this.Controls.Add(this.chkBeAPointInsertion);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cmdCancel);
             this.Controls.Add(this.cmdOK);
@@ -188,10 +154,7 @@
         private System.Windows.Forms.Button cmdOK;
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox chkBeAPointInsertion;
+        private System.Windows.Forms.CheckBox chkUsePortMapping;
     }
 }

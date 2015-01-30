@@ -76,6 +76,7 @@ namespace Kei.KTracker
         protected HttpServer(IPEndPoint localEndPoint)
         {
             _localEndPoint = localEndPoint;
+            _listener = new TcpListener(new IPEndPoint(IPAddress.Loopback, _localEndPoint.Port));
         }
 
         /// <summary>
@@ -87,6 +88,20 @@ namespace Kei.KTracker
             {
                 return _localEndPoint;
             }
+        }
+
+        /// <summary>
+        /// 设置本 HTTP 服务器的端点。
+        /// </summary>
+        /// <param name="ep">要设置为的端点。</param>
+        /// <exception cref="System.ArgumentNullException">ep 为 null 时发生。</exception>
+        public void SetLocalEndPoint(IPEndPoint ep)
+        {
+            if (ep == null)
+            {
+                throw new ArgumentNullException("ep");
+            }
+            _localEndPoint = ep;
         }
 
         /// <summary>
@@ -109,15 +124,66 @@ namespace Kei.KTracker
         }
 
         /// <summary>
+        /// 尝试将该 <see cref="Kei.KTracker.HttpServer"/> 和一个端点绑定，用来测试该端点的可用性。
+        /// </summary>
+        /// <param name="endPoint">要绑定的 <see cref="System.Net.IPEndPoint"/>。</param>
+        /// <returns>返回 true 表示端点可用，返回 false 表示端点不可用或者 socket 已经与一个 <see cref="System.Net.IPEndPoint"/> 绑定。</returns>
+        [Obsolete("此方法存在错误，不要使用。")]
+        private bool TestBind(IPEndPoint endPoint)
+        {
+            if (IsBound)
+            {
+                return false;
+            }
+            try
+            {
+                _listener.Server.Bind(endPoint);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取本 <see cref="Kei.KTracker.HttpServer"/> 是否已经与一个端点绑定。此属性为只读。
+        /// </summary>
+        [Obsolete("此属性存在错误，不要使用。")]
+        private bool IsBound
+        {
+            get
+            {
+                return _listener.Server.IsBound;
+            }
+        }
+
+        /// <summary>
         /// 将本 <see cref="Kei.KTracker.HttpServer"/> 绑定到设置的端口，并开始监听端口通信。
         /// </summary>
-        public void Listen()
+        /// <returns>一个 <see cref="System.Boolean"/>，表示启动是否成功。</returns>
+        public bool Listen()
         {
             if (_thread == null)
             {
-                _listener = new TcpListener(IPAddress.Any, _localEndPoint.Port);
-
                 Logger.Log("[HTTP]启动服务器。");
+                try
+                {
+                    _listener.Stop();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("[HTTP]先停止 TcpListener 时发生异常: " + ex.Message);
+                }
+                try
+                {
+                    _listener.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("[HTTP]启动时发生异常: " + ex.Message);
+                    return false;
+                }
                 _thread = new Thread(delegate()
                 {
                     while (_isActive)
@@ -156,8 +222,8 @@ namespace Kei.KTracker
                 });
                 _thread.IsBackground = true;
                 _thread.Start();
-                _listener.Start();
             }
+            return true;
         }
 
         /// <summary>
@@ -167,8 +233,15 @@ namespace Kei.KTracker
         {
             if (_thread != null)
             {
-                _isActive = false;
-                _listener.Stop();
+                try
+                {
+                    _isActive = false;
+                    _listener.Stop();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("[HTTP]停止时发生异常: " + ex.Message);
+                }
             }
         }
 

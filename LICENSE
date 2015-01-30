@@ -1,12 +1,21 @@
-﻿KeiSystem uses GNU General Public License version 2. See ./GPLv2 for full license text.
+﻿
+KeiSystem is licensed under the GNU General Public License version 2.
+Full license text can be found at ./GPLv2 or http://www.gnu.org/licenses/gpl-2.0.txt.
 
 ---
 
-MonoTorrent, which is hosted by The Mono Project, uses MIT License. See ./monotorrent/LICENSE for full license text.
+A part of KeiSystem uses MonoTorrent hosted by The Mono Project, which is licensed under the MIT License.
+Full license text can be found at ./MonoTorrent/LICENSE.
 
 ---
 
-A part of KeySystem uses modified SimpleHttpServer, which is developed by David Jeske. Full license text is as follows.
+A part of KeySystem uses modified SimpleHttpServer developed by David Jeske.
+Full license text is as follows.
 
 offered to the public domain for any use with no restriction
-and also with no warranty of any kind, please enjoy. - David Jeske. 
+and also with no warranty of any kind, please enjoy. - David Jeske.
+
+---
+
+A part of KeiSystem uses Mono.Nat developed by Alan McGovern and Ben Motmans, which is licensed under the MIT License.
+Full license text can be found at ./Mono.Nat/LICENSE.

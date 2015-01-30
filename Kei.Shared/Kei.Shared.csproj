@@ -51,14 +51,22 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="InfoHash.cs" />
-    <Compile Include="IPUtil.cs" />
+    <Compile Include="KeiUtil.cs" />
     <Compile Include="KEndPoint.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Peer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PortMapping.cs" />
+    <Compile Include="UPnPSupport.Obselete.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\ReferenceTypeExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Nat\Mono.Nat.csproj">
+      <Project>{f5d74163-145f-47bf-83dc-d0e07249c6ca}</Project>
+      <Name>Mono.Nat</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

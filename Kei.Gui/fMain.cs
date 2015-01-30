@@ -46,6 +46,7 @@ namespace Kei.Gui
 
         private TrackerServer _kTracker = null;
         private KClient _kClient = null;
+        private bool? _wasStartedAsPI = new Nullable<bool>();
 
         public KeiGuiState KGState
         {
@@ -193,6 +194,7 @@ namespace Kei.Gui
             {
                 KeiGuiOptions.Current = (KeiGuiOptions)KeiGuiOptions.Default.Clone();
             }
+            KeiGuiOptions.Modified = (KeiGuiOptions)KeiGuiOptions.Current.Clone();
 
             txtLocalKClientPort.Text = KeiGuiOptions.Current.LocalKClientPort.ToString();
             txtLocalTrackerServerPort.Text = KeiGuiOptions.Current.LocalTrackerServerPort.ToString();
@@ -202,20 +204,24 @@ namespace Kei.Gui
         {
             if (KGState >= KeiGuiState.ServersStarted)
             {
-                KeiGuiOptions.Current.LocalIntranetAddress = cboPossibleAddresses.Text;
-                KeiGuiOptions.Current.LocalKClientPort = _kClient.LocalListenEndPoint.Port;
-                KeiGuiOptions.Current.LocalTrackerServerPort = _kTracker.LocalEndPoint.Port;
+                // 只有在作为接入点启动的时候以下两项才是不变的
+                if (!(_wasStartedAsPI.HasValue && _wasStartedAsPI.Value))
+                {
+                    KeiGuiOptions.Modified.LocalIntranetAddress = cboPossibleAddresses.Text;
+                    KeiGuiOptions.Modified.LocalKClientPort = _kClient.LocalEndPoint.Port;
+                }
+                KeiGuiOptions.Modified.LocalTrackerServerPort = _kTracker.LocalEndPoint.Port;
             }
             if (KGState >= KeiGuiState.Connected)
             {
                 if (_kClient.ConnectionList.Count > 0)
                 {
-                    KeiGuiOptions.Current.TargetEndPoints.Clear();
+                    KeiGuiOptions.Modified.TargetEndPoints.Clear();
                     lock (_kClient.ConnectionList)
                     {
                         foreach (var item in _kClient.ConnectionList)
                         {
-                            KeiGuiOptions.Current.TargetEndPoints.Add(item.ClientLocation.ToString());
+                            KeiGuiOptions.Modified.TargetEndPoints.Add(item.ClientLocation.ToString());
                         }
                     }
                 }
@@ -229,7 +235,7 @@ namespace Kei.Gui
                     {
                         try
                         {
-                            KeiGuiOptions.Current.Save(xmlwriter);
+                            KeiGuiOptions.Modified.Save(xmlwriter);
                         }
                         catch (Exception)
                         {
@@ -246,48 +252,68 @@ namespace Kei.Gui
         {
             try
             {
-                IPEndPoint ipep = IPUtil.ParseIPEndPoint(cboTargetKClientEndPoint.Text);
+                IPEndPoint ipep = KeiUtil.ParseIPEndPoint(cboTargetKClientEndPoint.Text);
                 Thread kcWorkerThread;
-                var wh = _kClient.EnterNetwork(ipep, out kcWorkerThread);
-                Thread thread = new Thread(delegate()
+                for (var i = 0; i < 1; i++)
                 {
-                    Invoke(new Action(() =>
+                    //Thread.Sleep(1500);
+                    WaitHandle wh;
+                    if (KeiGuiOptions.Current.IsPointInsertion)
                     {
-                        cmdConnectToTargetKClient.Enabled = false;
-                    }));
-                    TimeSpan passedTime = TimeSpan.Zero;
-                    while (kcWorkerThread.IsAlive && !wh.SafeWaitHandle.IsClosed && passedTime < TimeSpan.FromSeconds(3))
-                    {
-                        wh.WaitOne(TimeSpan.FromMilliseconds(10));
-                        passedTime += TimeSpan.FromMilliseconds(10);
+                        wh = _kClient.EnterNetwork(ipep, Convert.ToUInt16(txtLocalKClientPort.Text), out kcWorkerThread);
                     }
-                    if (_kClient.ConnectionList.Count > 0)
+                    else
+                    {
+                        // 普通用户
+                        wh = _kClient.EnterNetwork(ipep, 0, out kcWorkerThread);
+                    }
+                    Thread thread = new Thread(delegate()
                     {
                         Invoke(new Action(() =>
                         {
                             cmdConnectToTargetKClient.Enabled = false;
-                            groupBox2.Enabled = false;
-                            KGState = KeiGuiState.Connected;
-                            if (!cboTargetKClientEndPoint.Items.Contains(cboTargetKClientEndPoint.Text))
-                            {
-                                cboTargetKClientEndPoint.Items.Add(cboTargetKClientEndPoint.Text);
-                            }
-                            SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作 [" + _kClient.ConnectionList.Count.ToString() + "]");
-                            mnuOpForceBroadcast.Enabled = true;
-                            ctxForceBroadcast.Enabled = true;
                         }));
-                    }
-                    else
-                    {
-                        Invoke(new Action(() =>
+                        TimeSpan passedTime = TimeSpan.Zero;
+                        while (kcWorkerThread.IsAlive && !wh.SafeWaitHandle.IsClosed && passedTime < TimeSpan.FromSeconds(3))
                         {
-                            cmdConnectToTargetKClient.Enabled = true;
-                            SetStatusText("未能连接到 " + cboTargetKClientEndPoint.Text);
-                        }));
-                    }
-                });
-                thread.IsBackground = true;
-                thread.Start();
+                            wh.WaitOne(TimeSpan.FromMilliseconds(10));
+                            passedTime += TimeSpan.FromMilliseconds(10);
+                        }
+                        if (_kClient.ConnectionList.Count > 0)
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                if (!_kClient.IsActive)
+                                {
+                                    // 普通用户此时启动
+                                    // 不过确实，想想，对于普通用户，如果是端口在从 TestBind() 到现在（即，点下“启动”按钮到点下“连接”按钮并成功）
+                                    // 这段时间内，该K客户端端口被占用了怎么办？这里就会直接异常，线程崩溃了……
+                                    _kClient.Listen();
+                                }
+                                cmdConnectToTargetKClient.Enabled = false;
+                                groupBox2.Enabled = false;
+                                KGState = KeiGuiState.Connected;
+                                if (!cboTargetKClientEndPoint.Items.Contains(cboTargetKClientEndPoint.Text))
+                                {
+                                    cboTargetKClientEndPoint.Items.Add(cboTargetKClientEndPoint.Text);
+                                }
+                                SetStatusText("已经连接到 " + cboTargetKClientEndPoint.Text + "，开始工作 [" + _kClient.ConnectionList.Count.ToString() + "]");
+                                mnuOpForceBroadcast.Enabled = true;
+                                ctxForceBroadcast.Enabled = true;
+                            }));
+                        }
+                        else
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                cmdConnectToTargetKClient.Enabled = true;
+                                SetStatusText("未能连接到 " + cboTargetKClientEndPoint.Text);
+                            }));
+                        }
+                    });
+                    thread.IsBackground = true;
+                    thread.Start();
+                }
             }
             catch (Exception ex)
             {
@@ -315,14 +341,57 @@ namespace Kei.Gui
 
         void cmdStartServers_Click(object sender, EventArgs e)
         {
-            if (_kClient == null && _kTracker == null)
+            if (_kClient == null || _kTracker == null)
             {
                 if (CheckServerFields())
                 {
-                    var ipa = IPAddress.Parse(cboPossibleAddresses.Text);
-                    _kTracker = new TrackerServer(new IPEndPoint(ipa, Convert.ToInt32(txtLocalTrackerServerPort.Text)));
-                    _kClient = new KClient(_kTracker, new IPEndPoint(ipa, Convert.ToInt32(txtLocalKClientPort.Text)));
-                    _kClient.ConnectionListChanged += _kClient_ConnectionListChanged;
+                    IPAddress ipa;
+                    _wasStartedAsPI = KeiGuiOptions.Current.IsPointInsertion;
+                    if (KeiGuiOptions.Current.IsPointInsertion || (false && KeiGuiOptions.Current.UsePortMapping))
+                    {
+                        // 作为接入点或者启用了 UPnP 的普通用户启动
+                        ipa = IPAddress.Parse(cboPossibleAddresses.Text.Split(' ')[0]);
+                    }
+                    else
+                    {
+                        // 作为普通用户启动
+                        ipa = IPAddress.Loopback;
+                    }
+                    var nTracker = Convert.ToInt32(txtLocalTrackerServerPort.Text);
+                    var nKClient = Convert.ToInt32(txtLocalKClientPort.Text);
+                    var trackerEndPoint = new IPEndPoint(ipa, nTracker);
+                    var kcEndPoint = new IPEndPoint(ipa, nKClient);
+
+                    if (_kTracker == null)
+                    {
+                        _kTracker = new TrackerServer(trackerEndPoint);
+                    }
+                    if (_kClient == null)
+                    {
+                        _kClient = new KClient(_kTracker, kcEndPoint);
+                        _kClient.ConnectionListChanged += _kClient_ConnectionListChanged;
+                    }
+
+                    //if (!_kTracker.IsBound)
+                    //{
+                    //    if (!_kTracker.TestBind(trackerEndPoint))
+                    //    {
+                    //        MessageBox.Show("Tracker 服务器端口不可用，请设置一个新的端口。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    //        _kTracker = null;
+                    //        return;
+                    //    }
+                    //}
+                    //txtLocalTrackerServerPort.Enabled = false;
+                    //if (!_kClient.IsBound)
+                    //{
+                    //    if (!_kClient.TestBind(kcEndPoint))
+                    //    {
+                    //        MessageBox.Show("K客户端服务器端口不可用，请设置一个新的端口。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    //        _kClient = null;
+                    //        return;
+                    //    }
+                    //}
+                    //txtLocalKClientPort.Enabled = false;
 
                     if (KeiGuiOptions.Current.EnableLogging)
                     {
@@ -330,8 +399,18 @@ namespace Kei.Gui
                         _kClient.Logger = Program.Logger;
                     }
 
+                    if (KeiGuiOptions.Current.IsPointInsertion)
+                    {
+                        _kClient.FreeToGo = true;
+                        _kTracker.FreeToGo = true;
+                    }
+
                     _kTracker.Listen();
-                    _kClient.Listen();
+                    if (KeiGuiOptions.Current.IsPointInsertion)
+                    {
+                        // 接入点立即启动，普通用户要连接到接入点后才能启动
+                        _kClient.Listen();
+                    }
 
                     groupBox1.Enabled = false;
                     groupBox2.Enabled = true;
@@ -354,7 +433,10 @@ namespace Kei.Gui
         {
             try
             {
-                var ipa = IPAddress.Parse(cboPossibleAddresses.Text);
+                if (KeiGuiOptions.Current.IsPointInsertion)
+                {
+                    var ipa = IPAddress.Parse(cboPossibleAddresses.Text.Split(' ')[0]);
+                }
                 int trackerPort, kcPort;
                 trackerPort = Convert.ToInt32(txtLocalTrackerServerPort.Text);
                 kcPort = Convert.ToInt32(txtLocalKClientPort.Text);
@@ -426,28 +508,158 @@ namespace Kei.Gui
         {
             TryReadOptions();
 
-            var possibleAddresses = Dns.GetHostEntry(IPAddress.Loopback).AddressList;
-            foreach (var address in possibleAddresses)
+            // 只有普通用户才能选择启用 UPnP
+            KeiGuiOptions.Current.UsePortMapping = KeiGuiOptions.Current.UsePortMapping && !KeiGuiOptions.Current.IsPointInsertion;
+            PortMapping.UsePortMapping = KeiGuiOptions.Current.UsePortMapping;
+            //if (KeiGuiOptions.Current.UseUPnP)
+            //{
+            //    ManagedUPnP.WindowsFirewall.CheckUPnPFirewallRules(this);
+            //}
+
+            if (KeiGuiOptions.Current.IsPointInsertion)
             {
-                if (address.AddressFamily == AddressFamily.InterNetwork && IPUtil.IsAddressIntranet(address))
-                {
-                    cboPossibleAddresses.Items.Add(address.ToString());
-                }
+                Text = Text + " (接入点)";
             }
-            if (cboPossibleAddresses.Items.Count > 0)
+
+            // 接入点是禁止通过路由的
+            if (!KeiGuiOptions.Current.IsPointInsertion && KeiGuiOptions.Current.UsePortMapping)
             {
-                if (cboPossibleAddresses.Items.Contains(KeiGuiOptions.Current.LocalIntranetAddress))
+                cmdStartServers.Enabled = false;
+                SetStatusText("初始化端口映射...");
+                Thread t = new Thread(delegate()
                 {
-                    cboPossibleAddresses.Text = KeiGuiOptions.Current.LocalIntranetAddress;
+                    //PortMapping.InitUPnP(TimeSpan.FromSeconds(20));
+                    PortMapping.InitializePortMappingEnvironment(TimeSpan.FromSeconds(5));
+                    KeiGuiOptions.Current.UsePortMapping = KeiGuiOptions.Current.UsePortMapping && PortMapping.CanUsePortMapping;
+                    label1.Visible = KeiGuiOptions.Current.UsePortMapping;
+                    cboPossibleAddresses.Visible = KeiGuiOptions.Current.UsePortMapping;
+                    // HACK: HACK
+                    label1.Visible = cboPossibleAddresses.Visible = false;
+                    if (KeiGuiOptions.Current.UsePortMapping)
+                    {
+                        SetStatusText("就绪");
+                    }
+                    else
+                    {
+                        SetStatusText("就绪 (端口映射不可用)");
+                    }
+                    cmdStartServers.Enabled = true;
+                });
+                t.IsBackground = true;
+                t.Start();
+            }
+            else
+            {
+                SetStatusText("就绪");
+            }
+
+            // 如果这只小白鼠（例如我）愿意做接入点的话……那就给ta选吧
+            // 设置界面项：如果是接入点（高级用户）或者是要使用 UPnP 的用户，则应该显示本地地址
+            if (KeiGuiOptions.Current.IsPointInsertion || (false && KeiGuiOptions.Current.UsePortMapping))
+            {
+                //var possibleAddresses = Dns.GetHostEntry(IPAddress.Loopback).AddressList;
+                //foreach (var address in possibleAddresses)
+                //{
+                //    if (address.AddressFamily == AddressFamily.InterNetwork && IPUtil.IsAddressIntranet(address))
+                //    {
+                //        cboPossibleAddresses.Items.Add(address.ToString());
+                //    }
+                //}
+
+                var ifs = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                foreach (var face in ifs)
+                {
+                    switch (face.NetworkInterfaceType)
+                    {
+                        case System.Net.NetworkInformation.NetworkInterfaceType.Ethernet:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.Ethernet3Megabit:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.FastEthernetFx:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.FastEthernetT:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.Fddi:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.GigabitEthernet:
+                        case System.Net.NetworkInformation.NetworkInterfaceType.Wireless80211:
+                            if (face.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up)
+                            {
+                                var p = face.GetIPProperties();
+                                if (p.UnicastAddresses.Count > 0)
+                                {
+                                    foreach (var a in p.UnicastAddresses)
+                                    {
+                                        if (a.Address.AddressFamily == AddressFamily.InterNetwork && KeiUtil.IsAddressIntranet(a.Address))
+                                        {
+                                            cboPossibleAddresses.Items.Add(a.Address.ToString() + " [" + face.Name + "]");
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                // 调整 combobox 的下拉宽度
+                if (cboPossibleAddresses.Items.Count > 0)
+                {
+                    SizeF maxSizeF = SizeF.Empty;
+                    using (var g = cboPossibleAddresses.CreateGraphics())
+                    {
+                        foreach (var item in cboPossibleAddresses.Items)
+                        {
+                            var s = g.MeasureString((string)item, cboPossibleAddresses.Font);
+                            if (s.Width > maxSizeF.Width)
+                            {
+                                maxSizeF = s;
+                            }
+                        }
+                    }
+                    cboPossibleAddresses.DropDownWidth = (int)Math.Ceiling(maxSizeF.Width);
+                }
+
+                if (cboPossibleAddresses.Items.Count > 0)
+                {
+                    int foundIndex = -1;
+                    int i = 0;
+                    bool found = false;
+                    foreach (var item in cboPossibleAddresses.Items)
+                    {
+                        if (((string)item).StartsWith(KeiGuiOptions.Current.LocalIntranetAddress))
+                        {
+                            found = true;
+                            foundIndex = i;
+                            break;
+                        }
+                        i++;
+                    }
+                    if (found)
+                    {
+                        cboPossibleAddresses.SelectedIndex = foundIndex;
+                    }
+                    else
+                    {
+                        cboPossibleAddresses.SelectedIndex = 0;
+                    }
                 }
                 else
                 {
-                    cboPossibleAddresses.SelectedIndex = 0;
+                    MessageBox.Show("在您的计算机上没有找到合适的内网地址，将无法正常启动。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("在您的计算机上没有找到合适的内网地址，将无法正常启动。", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label1.Visible = false;
+                cboPossibleAddresses.Visible = false;
+            }
+            // 设置界面项：如果是普通用户，就不需要知道本地的客户端端点了
+            if (!KeiGuiOptions.Current.IsPointInsertion)
+            {
+                label5.Visible = false;
+                txtLocalKClientEndPoint.Visible = false;
+            }
+            // 设置界面项：如果是接入点，则“连接”框都可以免去了
+            if (false && KeiGuiOptions.Current.IsPointInsertion)
+            {
+                groupBox2.Visible = false;
             }
 
             foreach (var item in KeiGuiOptions.Current.TargetEndPoints)
@@ -459,7 +671,6 @@ namespace Kei.Gui
             groupBox2.Enabled = false;
             mnuOpForceBroadcast.Enabled = false;
             ctxForceBroadcast.Enabled = false;
-            SetStatusText("就绪");
 
             notifier.Icon = this.Icon;
             notifier.ContextMenu = ctxMenu;

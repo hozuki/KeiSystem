@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -50,7 +51,7 @@ namespace Kei
         public fixed byte Address[4];
 
         /// <summary>
-        /// 该端点的端口。
+        /// 该端点的端口。注意低位在前面（索引0）。
         /// </summary>
         public fixed byte Port[2];
 
@@ -173,8 +174,8 @@ namespace Kei
                     throw new ArgumentOutOfRangeException("port");
                 }
                 byte b1, b2;
-                b1 = (byte)((port & 0x0000ff00) >> 8);
-                b2 = (byte)(port & 0x000000ff);
+                b1 = (byte)(port & 0x000000ff);
+                b2 = (byte)((port & 0x0000ff00) >> 8);
                 fixed (byte* p = Port)
                 {
                     p[0] = b1;
@@ -216,6 +217,42 @@ namespace Kei
         }
 
         /// <summary>
+        /// 判断该端点的地址与给定地址是否相同。
+        /// </summary>
+        /// <param name="address">给定的地址。</param>
+        /// <returns>返回 true 表示相同，返回 false 表示不相同。</returns>
+        /// <exception cref="System.ArgumentNullException">address 为 null 时发生。</exception>
+        /// <exception cref="System.ArgumentException">给定了无效的地址时发生。</exception>
+        public bool AddressEquals(IPAddress address)
+        {
+            if (address == null)
+            {
+                throw new ArgumentNullException("address");
+            }
+            if (address.AddressFamily != AddressFamily.InterNetwork && address.AddressFamily != AddressFamily.InterNetworkV6)
+            {
+                throw new ArgumentNullException("给定的地址无效。");
+            }
+            byte[] addrBytes = null;
+            if (address.AddressFamily == AddressFamily.InterNetwork)
+            {
+                addrBytes = address.GetAddressBytes();
+            }
+            else if (address.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                addrBytes = address.GetAddressBytes();
+                addrBytes = addrBytes.Skip(addrBytes.Length - 4).ToArray();
+            }
+            unsafe
+            {
+                fixed (byte* p = Address)
+                {
+                    return addrBytes[0] == p[0] && addrBytes[1] == p[1] && addrBytes[2] == p[2] && addrBytes[3] == p[3];
+                }
+            }
+        }
+
+        /// <summary>
         /// 获取该端点地址的字节数组表示形式。
         /// </summary>
         /// <returns>一个长度为 4 的 <see cref="System.Byte"/>[]，表示该端点的地址。</returns>
@@ -245,7 +282,7 @@ namespace Kei
             {
                 fixed (byte* p = Port)
                 {
-                    return (int)((p[0] << 8) + p[1]);
+                    return (int)((((int)p[1]) << 8) + p[0]);
                 }
             }
         }
@@ -291,8 +328,9 @@ namespace Kei
         /// <summary>
         /// 获取该端点的字节数组表示形式。
         /// </summary>
+        /// <param name="littleEndian">是否使用 little endian 字节序。问题一般出在端口上，<see cref="System.BitConverter"/> 使用 little endian（true），但是需要给 BitTorrent 客户端返回的信息却是 big endian（false）。</param>
         /// <returns>一个长度为 6 的 <see cref="System.Byte"/>[]，其中前 4 个元素为地址，后 2 个元素为端口。</returns>
-        public byte[] ToByteArray()
+        public byte[] ToByteArray(bool littleEndian = true)
         {
             unsafe
             {
@@ -300,7 +338,14 @@ namespace Kei
                 {
                     fixed (byte* q = Port)
                     {
-                        return new[] { p[0], p[1], p[2], p[3], q[0], q[1] };
+                        if (littleEndian)
+                        {
+                            return new[] { p[0], p[1], p[2], p[3], q[0], q[1] };
+                        }
+                        else
+                        {
+                            return new[] { p[0], p[1], p[2], p[3], q[1], q[0] };
+                        }
                     }
                 }
             }
@@ -339,23 +384,41 @@ namespace Kei
         /// <summary>
         /// 从字节数组创建一个 <see cref="Kei.KEndPoint"/>。
         /// </summary>
-        /// <param name="bytes">带有数据的字节数组。长度必须为 6，前 4 个元素为地址，后 2 个元素为端口。</param>
+        /// <param name="bytes">带有数据的字节数组。长度必须为 6，前 4 个元素为地址，后 2 个元素为端口（低位在前）。</param>
         /// <returns>创建的 <see cref="Kei.KEndPoint"/>。</returns>
+        /// <exception cref="System.ArgumentNullException">bytes 为 null 时发生。</exception>
         /// <exception cref="System.ArgumentException">bytes 长度不为 6 时发生。</exception>
-        public static unsafe KEndPoint FromByteArray(byte[] bytes)
+        public static KEndPoint FromByteArray(byte[] bytes)
         {
-            if (bytes == null || bytes.Length != 6)
+            unsafe
             {
-                throw new ArgumentException("无效的用于创建 KEndPoint 的字节数组。");
+                if (bytes == null)
+                {
+                    throw new ArgumentNullException("bytes");
+                }
+                if (bytes.Length != 6)
+                {
+                    throw new ArgumentException("无效的用于创建 KEndPoint 的字节数组。");
+                }
+                KEndPoint kep;
+                kep.Address[0] = bytes[0];
+                kep.Address[1] = bytes[1];
+                kep.Address[2] = bytes[2];
+                kep.Address[3] = bytes[3];
+                kep.Port[0] = bytes[4];
+                kep.Port[1] = bytes[5];
+                return kep;
             }
-            KEndPoint kep;
-            kep.Address[0] = bytes[0];
-            kep.Address[1] = bytes[1];
-            kep.Address[2] = bytes[2];
-            kep.Address[3] = bytes[3];
-            kep.Port[0] = bytes[4];
-            kep.Port[1] = bytes[5];
-            return kep;
+        }
+
+        /// <summary>
+        /// 获取一个指定端口的默认环回端点。
+        /// </summary>
+        /// <param name="port">指定的端口。</param>
+        /// <returns>生成的 <see cref="Kei.KEndPoint"/>。</returns>
+        public static KEndPoint GetLoopbackEndPoint(int port)
+        {
+            return KEndPoint.FromEndPoint(new IPEndPoint(IPAddress.Loopback, port));
         }
         #endregion
 

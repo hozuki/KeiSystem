@@ -72,12 +72,12 @@ namespace Kei
         }
 
         /// <summary>
-        /// 返回该 <see cref="Kei.Peer"/> 的字节数组表示形式。
+        /// 返回该 <see cref="Kei.Peer"/> 的字节数组表示形式。注意是 big endian。
         /// </summary>
         /// <returns>该 <see cref="Kei.Peer"/> 的字节数组表示形式。</returns>
         public byte[] ToByteArray()
         {
-            return EndPoint.ToByteArray();
+            return EndPoint.ToByteArray(false);
         }
 
         /// <summary>

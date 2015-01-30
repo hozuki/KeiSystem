@@ -1,4 +1,4 @@
-# KeiTNorm
+# KeiSystem 种子文件标准化工具 (KeiTNorm)
 
 KeiTNorm 是 KeiSystem.TorrentNormalizer 的简写，对应 KeiTNorm.exe。
 
@@ -20,7 +20,9 @@ KeiTNorm 是 KeiSystem.TorrentNormalizer 的简写，对应 KeiTNorm.exe。
 
 单击“生成新种子”按钮。如果预计的位置已经有了相应的文件，会询问您是否覆盖。
 
-会在原文件的目录下生成以“[KS].”为前缀的新文件。例如，原文件名为 `[FGBT].[CASO&SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent`，则生成的文件名将是 `[KS].[FGBT].[CASO&SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent`。
+会在原文件的目录下生成以“[KS].”为前缀的新文件。
+
+例如，原文件名为 `[FGBT].[CASO&SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent`，则生成的文件名将是 `[KS].[FGBT].[CASO&SumiSora][Le_Fruit_de_la_Grisaia][01-13][GB][720p].torrent`。
 
 生成的种子就可以发布了。
 
@@ -47,7 +49,7 @@ KeiTNorm 是 KeiSystem.TorrentNormalizer 的简写，对应 KeiTNorm.exe。
 
 ------
 
-最后更新于 2015-01-27
+最后更新于 2015-01-29
 
 [返回主页](./index.htm)
 

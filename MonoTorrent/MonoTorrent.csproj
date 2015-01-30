@@ -92,6 +92,8 @@
     <Compile Include="BanLists\BanList.cs" />
     <Compile Include="BanLists\ListParser.cs" />
     <Compile Include="BanLists\RangeCollection.cs" />
+    <None Include="AssemblyInfo.cs.in" />
+    <None Include="ChangeLog" />
     <None Include="LICENSE" />
     <Compile Include="MonoTorrent.Client\ConnectionListeners\LocalPeerListener.cs" />
     <Compile Include="MonoTorrent.Client\ConnectionListeners\UdpListener.cs" />
@@ -327,6 +329,7 @@
     <Compile Include="MonoTorrent.Common\RawTrackerTier.cs" />
     <Compile Include="MonoTorrent.Common\EditableTorrent.cs" />
     <Compile Include="MonoTorrent.Client\WaitHandleGroup.cs" />
+    <None Include="monotorrent.pc.in" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">

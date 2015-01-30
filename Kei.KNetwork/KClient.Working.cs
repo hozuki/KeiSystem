@@ -52,20 +52,72 @@ namespace Kei.KNetwork
         private Thread _workerThread;
 
         /// <summary>
+        /// 尝试将该 <see cref="Kei.KNetwork.KClient"/> 和一个端点绑定，用来测试该端点的可用性。
+        /// </summary>
+        /// <param name="endPoint">要绑定的 <see cref="System.Net.IPEndPoint"/>。</param>
+        /// <returns>返回 true 表示端点可用，返回 false 表示端点不可用或者 socket 已经与一个 <see cref="System.Net.IPEndPoint"/> 绑定。</returns>
+        [Obsolete("此方法存在错误，不要使用。")]
+        private bool TestBind(IPEndPoint endPoint)
+        {
+            if (IsBound)
+            {
+                return false;
+            }
+            try
+            {
+                _listener.Server.Bind(endPoint);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取本 <see cref="Kei.KNetwork.KClient"/> 是否已经与一个端点绑定。此属性为只读。
+        /// </summary>
+        [Obsolete("此属性存在错误，不要使用。")]
+        private bool IsBound
+        {
+            get
+            {
+                return _listener.Server.IsBound;
+            }
+        }
+
+        /// <summary>
         /// 启动监听过程。
         /// </summary>
-        public void Listen()
+        /// <returns>一个 <see cref="System.Boolean"/>，表示启动是否成功。</returns>
+        public bool Listen()
         {
             if (_workerThread == null)
             {
                 IsActive = true;
-                _listener = new TcpListener(IPAddress.Any, LocalKEndPoint.GetPortNumber());
-                _listener.Start();
-                Logger.Log("启动 KClient。");
+                try
+                {
+                    _listener.Stop();
+                }
+                catch (Exception)
+                {
+                }
+                try
+                {
+                    _listener.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("启动服务器时发生异常: " + ex.Message);
+                    IsActive = false;
+                    return false;
+                }
+                Logger.Log("启动 KClient。此时 Listener 的 socket 的本地端点为 " + _listener.Server.LocalEndPoint.ToString());
                 _workerThread = new Thread(WorkProc);
                 _workerThread.IsBackground = true;
                 _workerThread.Start();
             }
+            return true;
         }
 
         /// <summary>
@@ -76,9 +128,16 @@ namespace Kei.KNetwork
         {
             if (_workerThread != null)
             {
-                _listener.Stop();
-                Logger.Log("尝试停止 KClient。");
-                IsActive = false;
+                try
+                {
+                    _listener.Stop();
+                    Logger.Log("尝试停止 KClient。");
+                    IsActive = false;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("停止服务器时发生异常: " + ex.Message);
+                }
             }
         }
 
@@ -95,7 +154,7 @@ namespace Kei.KNetwork
                     iar = _listener.BeginAcceptTcpClient(null, null);
                     while (!iar.IsCompleted && IsActive)
                     {
-                        iar.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(10));
+                        iar.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
                     }
                     if (iar.IsCompleted && IsActive)
                     {
@@ -128,10 +187,17 @@ namespace Kei.KNetwork
                 KMessage message;
                 Logger.Log("读取消息。");
                 err = bs.ReadMessage(out message);
-                Logger.Log("处理消息。");
                 if (err == MessageIOErrorCode.NoError)
                 {
-                    HandleMessage(bs, message);
+                    Logger.Log("处理消息。");
+                    try
+                    {
+                        HandleMessage(new HandleMessageArgs(bs, message, (IPEndPoint)tcpClient.Client.RemoteEndPoint, 0));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("处理消息发生错误，错误信息: " + ex.Message);
+                    }
                 }
                 else
                 {
@@ -142,9 +208,9 @@ namespace Kei.KNetwork
         }
 
         /// <summary>
-        /// 获取或设置是否工作。
+        /// 获取本 <see cref="Kei.KNetwork.KClient"/> 是否正在工作。
         /// </summary>
-        private bool IsActive
+        public bool IsActive
         {
             get
             {
@@ -153,7 +219,7 @@ namespace Kei.KNetwork
                     return _isActive;
                 }
             }
-            set
+            private set
             {
                 lock (this)
                 {

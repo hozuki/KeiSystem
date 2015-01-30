@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specification", "specificat
 	ProjectSection(SolutionItems) = preProject
 		docs\specification\k-dist-tracker.v1.1.html = docs\specification\k-dist-tracker.v1.1.html
 		docs\specification\k-dist-tracker.v1.1.md = docs\specification\k-dist-tracker.v1.1.md
+		docs\specification\k-dist-tracker.v1.2.html = docs\specification\k-dist-tracker.v1.2.html
+		docs\specification\k-dist-tracker.v1.2.md = docs\specification\k-dist-tracker.v1.2.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kei.Gui", "Kei.Gui\Kei.Gui.csproj", "{E2423CE1-CA61-46AD-984A-2D6DD70F79F6}"
@@ -47,6 +49,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "help", "help", "{191852BB-E
 		docs\help\tnorm.htm = docs\help\tnorm.htm
 		docs\help\tnorm.md = docs\help\tnorm.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono", "Mono", "{8943A1AF-DEBD-48BF-ADBD-11B1700CF457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Nat", "Mono.Nat\Mono.Nat.csproj", "{F5D74163-145F-47BF-83DC-D0E07249C6CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,12 +103,18 @@ Global
 		{A9A13A60-8AEB-4F12-9DDA-15BA6C4E30EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9A13A60-8AEB-4F12-9DDA-15BA6C4E30EA}.Stats|Any CPU.ActiveCfg = Release|Any CPU
 		{A9A13A60-8AEB-4F12-9DDA-15BA6C4E30EA}.Stats|Any CPU.Build.0 = Release|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Stats|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA}.Stats|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
+		{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8} = {8943A1AF-DEBD-48BF-ADBD-11B1700CF457}
 		{59B23B38-918C-4401-909C-F85CDCB0CD44} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{DB1E6070-1221-4153-831E-D56472E90CC1} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{93143C61-49CB-45A8-8033-C125D967EE8D} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
@@ -112,5 +124,7 @@ Global
 		{E2423CE1-CA61-46AD-984A-2D6DD70F79F6} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{A9A13A60-8AEB-4F12-9DDA-15BA6C4E30EA} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
 		{191852BB-E2F4-48A5-B0C1-F995046C5FFE} = {4FDA5EB2-2BC1-4DB4-9402-588B3DEEE2CF}
+		{8943A1AF-DEBD-48BF-ADBD-11B1700CF457} = {CE60FEC0-AA58-4CAE-8AFA-316734811BBD}
+		{F5D74163-145F-47BF-83DC-D0E07249C6CA} = {8943A1AF-DEBD-48BF-ADBD-11B1700CF457}
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>KeiGui</title>
+<title>KeiSystem 图形界面操作程序 (KeiGui)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -289,9 +289,10 @@ img {
   max-width: 100%
 }
 </style>
+<base href='file:\\\D:\Source Code Of Programs\GitHub\KeiSystem\docs\help\'/>
 </head>
 <body>
-<h1>KeiGui</h1>
+<h1>KeiSystem 图形界面操作程序 (KeiGui)</h1>
 <p>KeiGui 是 KeiSystem 的图形界面操作程序。它通过图形化的方式提供 KeiSystem 的基础操作。</p>
 <p>以下部分将介绍 KeiGui 的<a href="#interface">界面组成</a>及<a href="#usage">使用方式</a>。</p>
 <h2><span id="interface">界面</span></h2>
@@ -336,6 +337,8 @@ img {
 <ul>
 <li>“启用日志记录”: 是否记录日志并保存到 <code>ksyslog.log</code>（以供调试）。默认为选中。</li>
 <li>“强制广播时间”: 强制广播的持续时间。</li>
+<li>“作为接入点启动”: 是否将本客户端作为接入点启动。</li>
+<li>“尝试端口映射”: 是否启用支持 UPnP/NAT-PMP 的路由器的端口映射功能，以让 KS 客户端在路由器后也可以通信。如果不选中该选项，则当 KS 客户端在一台通过路由器接入校园网的主机上运行时无法从其他客户端处收到消息。接入点不支持该选项。</li>
 </ul>
 <h3>通知区域图标</h3>
 <p>双击可以显示主窗口。</p>
@@ -348,15 +351,26 @@ img {
 <h2><span id="usage">使用</span></h2>
 <h3>第 1 步: 启动 KeiSystem 客户端</h3>
 <p>双击 KeiGui.exe（MacOS/Linux 用户请执行 <code>mono KeiGui.exe</code> 命令），可见 KeiGui 窗口显示在屏幕上。</p>
-<p>如果弹出提示“无有效内网地址”，说明您的网络配置有问题，请咨询专业人士解决。</p>
+<p>如果显示对话框提示“无有效内网地址”，说明您的网络配置有问题，请咨询专业人士解决。</p>
+<p>对于设置尝试启用 UPnP 的用户，请先配置 Windows 防火墙（IPSec）或者 iptables，启用相关服务。</p>
 <h3>第 2 步: 启动本地服务器</h3>
+<blockquote>
+<p>普通用户不能进行该操作。</p>
+</blockquote>
 <p>在“内网地址”下拉框中选择一个有效的内网地址。“K客户端监听端口”和“Tracker 服务器监听端口”保持默认即可。</p>
+<p>对于接入点，该地址是接入点提供服务的地址。</p>
+<p><strong>注意，当路由器状态变化等等网络环境变化发生时，端口可能变为无效，建议启用端口映射的普通用户重新启动 KS 客户端。</strong></p>
 <blockquote>
 <p>有效的内网地址一般形式为 10.*.*.*、172.16.*.*-172.31.*.*、192.168.*.*。但是请注意，一些保留地址，如 192.168.0.1，不是有效的内网地址。下拉列表中含有多项的同学特别要注意。如果启动失败，大部分原因是因为您使用了一个无效的内网地址，不过也不排除端口被占用的情形。可以查阅程序日志（如果启用了日志记录）查看失败的原因。</p>
+<p>在地址后会显示该地址对应的连接名称，方便选择。</p>
 </blockquote>
 <h3>第 3 步: 接入 KS 网络</h3>
+<blockquote>
+<p>接入点不需要进行该操作。</p>
+</blockquote>
 <p>在“接入点”下拉框中填入或选择一个接入点，点击“连接”按钮。</p>
-<p>如果连接失败，请更换接入点。如果所有接入点连接失败……好吧，您暂时无法加入 KS 网络，不过内网中的其他人也许能连接到您这儿。不过即使接入失败，本机的服务器依然是有效的。</p>
+<p>如果连接失败，请更换接入点。尽量选择公开的接入点。如果所有接入点连接失败……好吧，您暂时无法加入 KS 网络，不过内网中的其他人也许能连接到您这儿。不过即使接入失败，本机的服务器依然是有效的。</p>
+<p>在小部分情况下，可能会出现单击多次却无法接入的情况。此时一般已经因操作过快而发生了内部错误（记录在错误日志中），请重新启动 KS 客户端。</p>
 <h3>第 4 步: 启动 BT 客户端</h3>
 <p>启动 BT 客户端，例如 μTorrent、BitComet 和 Transmission。</p>
 <h3>第 5 步: 与 BT 相关的操作</h3>
@@ -374,7 +388,7 @@ img {
 </ol>
 <p>这样，就可以很大可能性地找到刚才选中的那些种子。</p>
 <hr />
-<p>最后更新于 2015-01-27</p>
+<p>最后更新于 2015-01-30</p>
 <p><a href="./index.htm">返回主页</a></p>
 <p>Copyright (C) 2015 micstu@FGBT</p>
 

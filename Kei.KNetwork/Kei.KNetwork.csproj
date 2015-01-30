@@ -47,7 +47,9 @@
   <ItemGroup>
     <Compile Include="ConnectionListItem.cs" />
     <Compile Include="ConnectionState.cs" />
+    <Compile Include="Extensions\SocketExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="HandleMessageArgs.cs" />
     <Compile Include="KClient.Interops.cs" />
     <Compile Include="KClient.Working.cs" />
     <Compile Include="KClient.Connection.cs" />
