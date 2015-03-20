@@ -73,10 +73,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tmrForceBroadcast = new System.Windows.Forms.Timer(this.components);
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lstConnectionList = new System.Windows.Forms.ListBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.statusBarPanel1)).BeginInit();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // notifier
@@ -165,16 +168,16 @@
             this.groupBox2.Controls.Add(this.cmdConnectToTargetKClient);
             this.groupBox2.Controls.Add(this.cboTargetKClientEndPoint);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Location = new System.Drawing.Point(240, 12);
+            this.groupBox2.Location = new System.Drawing.Point(12, 155);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(251, 137);
+            this.groupBox2.Size = new System.Drawing.Size(222, 82);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "接入分布网络";
             // 
             // cmdConnectToTargetKClient
             // 
-            this.cmdConnectToTargetKClient.Location = new System.Drawing.Point(151, 46);
+            this.cmdConnectToTargetKClient.Location = new System.Drawing.Point(122, 46);
             this.cmdConnectToTargetKClient.Name = "cmdConnectToTargetKClient";
             this.cmdConnectToTargetKClient.Size = new System.Drawing.Size(92, 28);
             this.cmdConnectToTargetKClient.TabIndex = 5;
@@ -186,7 +189,7 @@
             this.cboTargetKClientEndPoint.FormattingEnabled = true;
             this.cboTargetKClientEndPoint.Location = new System.Drawing.Point(59, 20);
             this.cboTargetKClientEndPoint.Name = "cboTargetKClientEndPoint";
-            this.cboTargetKClientEndPoint.Size = new System.Drawing.Size(184, 20);
+            this.cboTargetKClientEndPoint.Size = new System.Drawing.Size(155, 20);
             this.cboTargetKClientEndPoint.TabIndex = 4;
             // 
             // label4
@@ -262,7 +265,7 @@
             // 
             // statusBar
             // 
-            this.statusBar.Location = new System.Drawing.Point(0, 246);
+            this.statusBar.Location = new System.Drawing.Point(0, 328);
             this.statusBar.Name = "statusBar";
             this.statusBar.Panels.AddRange(new System.Windows.Forms.StatusBarPanel[] {
             this.statusBarPanel1});
@@ -317,7 +320,7 @@
             this.groupBox3.Controls.Add(this.txtLocalKClientEndPoint);
             this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.label5);
-            this.groupBox3.Location = new System.Drawing.Point(12, 155);
+            this.groupBox3.Location = new System.Drawing.Point(12, 243);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(479, 79);
             this.groupBox3.TabIndex = 3;
@@ -358,11 +361,31 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "本地K客户端端点:";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.lstConnectionList);
+            this.groupBox4.Location = new System.Drawing.Point(240, 12);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(251, 225);
+            this.groupBox4.TabIndex = 4;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "连接列表";
+            // 
+            // lstConnectionList
+            // 
+            this.lstConnectionList.FormattingEnabled = true;
+            this.lstConnectionList.ItemHeight = 12;
+            this.lstConnectionList.Location = new System.Drawing.Point(6, 20);
+            this.lstConnectionList.Name = "lstConnectionList";
+            this.lstConnectionList.Size = new System.Drawing.Size(237, 196);
+            this.lstConnectionList.TabIndex = 0;
+            // 
             // fMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(503, 268);
+            this.ClientSize = new System.Drawing.Size(503, 350);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.groupBox2);
@@ -381,6 +404,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.statusBarPanel1)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -424,6 +448,8 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Timer tmrForceBroadcast;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.ListBox lstConnectionList;
     }
 }
 

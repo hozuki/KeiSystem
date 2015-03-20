@@ -98,6 +98,14 @@ namespace Kei.Gui
             {
                 SetStatusText("服务器已启动 [" + _kClient.ConnectionList.Count.ToString() + "]");
             }
+            lock (_kClient.ConnectionList)
+            {
+                lstConnectionList.Items.Clear();
+                foreach (var item in _kClient.ConnectionList)
+                {
+                    lstConnectionList.Items.Add(item.ToString());
+                }
+            }
         }
 
         void mnuHelpContent_Click(object sender, EventArgs e)

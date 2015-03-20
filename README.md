@@ -6,7 +6,9 @@
 
 ------
 
-稍后添加详情。
+<del>稍后添加详情。</del>
+
+KeiSystem 的 Java 代码移植见 [KeiSystem-Java](https://github.com/GridScience/KeiSystem-Java/)，包含预计的概念更新。
 
 ## 模块
 
